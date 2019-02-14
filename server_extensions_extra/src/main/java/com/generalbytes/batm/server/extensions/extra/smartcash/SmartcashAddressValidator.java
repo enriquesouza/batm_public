@@ -24,7 +24,7 @@ import com.generalbytes.batm.server.extensions.ICryptoAddressValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SmartcashAddressValidator implements ICryptoAddressValidator {
+public class SmartCashAddressValidator implements ICryptoAddressValidator {
     private static final Logger log = LoggerFactory.getLogger("batm.master.extensions.SmartcashAddressValidator");
 
     @Override
@@ -49,7 +49,7 @@ public class SmartcashAddressValidator implements ICryptoAddressValidator {
 
     @Override
     public boolean isPaperWalletSupported() {
-        return false;
+        return true;
     }
 
     @Override

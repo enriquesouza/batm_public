@@ -47,12 +47,12 @@ public abstract class AbstractRPCPaymentSupport implements IPaymentSupport{
     private static final Logger log = LoggerFactory.getLogger("batm.master.RPCPaymentSupport");
 
 
-    private final Map<PaymentRequest, PaymentTracker> requests = new HashMap<>();
+    protected final Map<PaymentRequest, PaymentTracker> requests = new HashMap<>();
     private IExtensionContext ctx;
     private final Map<RPCClient, IBlockchainWatcher> watchers = new HashMap<>();
 
 
-    private RPCClient getClient(IWallet wallet) {
+    protected RPCClient getClient(IWallet wallet) {
         if (wallet != null && (wallet instanceof IRPCWallet)) {
             return ((IRPCWallet) wallet).getClient();
         }
@@ -171,7 +171,7 @@ public abstract class AbstractRPCPaymentSupport implements IPaymentSupport{
 
     public abstract long getMaximumWatchingTimeMillis();
 
-    class PaymentTracker implements IBlockchainWatcherAddressListener, IBlockchainWatcherTransactionListener {
+    public class PaymentTracker implements IBlockchainWatcherAddressListener, IBlockchainWatcherTransactionListener {
         private boolean performForward;
         private PaymentRequest request;
         private IPaymentRequestSpecification spec;
@@ -220,52 +220,63 @@ public abstract class AbstractRPCPaymentSupport implements IPaymentSupport{
         }
 
         @Override
-        public void numberOfConfirmationsChanged(String cryptoCurrency, String transactionHash, Object tag, int numberOfConfirmations) {
-            if (incomingTransactions.size() > 0 && request.getState() != PaymentRequest.STATE_REMOVED) {
-                if (!seenInBlockChain) {
+        public void numberOfConfirmationsChanged(String cryptoCurrency, String transactionHash, Object tag,
+                int numberOfConfirmations) {
+            try {
+                if (incomingTransactions.size() > 0 && request.getState() != PaymentRequest.STATE_REMOVED) {
+                    if (!seenInBlockChain) {
 
-                    boolean performConfirmation = false;
-                    BitcoindRpcClient.RawTransaction transaction = (BitcoindRpcClient.RawTransaction) tag;
+                        boolean performConfirmation = false;
+                        BitcoindRpcClient.Transaction transaction = (BitcoindRpcClient.Transaction) tag;
 
-                    if (incomingTransactions.size() > 0 && hasHashOfOne(transaction, incomingTransactions)) {
-                        log_debug("PaymentTransactionListener.numberOfConfirmationsChanged - Incoming payment " + request.getAddress() + " appeared in blockchain (" + numberOfConfirmations + "). Confirmed.");
-                        performConfirmation = true;
-                        seenInBlockChain = true;
-                    }
-
-                    if (performConfirmation) {
-                        int previousState = request.getState();
-                        request.setState(PaymentRequest.STATE_SEEN_IN_BLOCK_CHAIN);
-                        fireStateChanged(request, previousState);
-                    }
-                }
-
-                if (request.getState() == PaymentRequest.STATE_SEEN_IN_BLOCK_CHAIN) {
-                    if (numberOfConfirmations > 0) {
-                        BitcoindRpcClient.RawTransaction transaction = (BitcoindRpcClient.RawTransaction) tag;
-                        IPaymentRequestListener.Direction direction = IPaymentRequestListener.Direction.INCOMING;
-                        if (hasHashOfOne(transaction, outgoingTransactions)) {
-                            direction = IPaymentRequestListener.Direction.OUTGOING;
+                        if (incomingTransactions.size() > 0 && hasHashOfOne(transaction.raw(), incomingTransactions)) {
+                            log_debug("PaymentTransactionListener.numberOfConfirmationsChanged - Incoming payment "
+                                    + request.getAddress() + " appeared in blockchain (" + numberOfConfirmations
+                                    + "). Confirmed.");
+                            performConfirmation = true;
+                            seenInBlockChain = true;
                         }
-                        fireNumberOfConfirmationsChanged(request,numberOfConfirmations,direction);
-                        //transaction is waiting to be removed
-                        if (direction == IPaymentRequestListener.Direction.INCOMING) {
-                            if (numberOfConfirmations >= request.getRemoveAfterNumberOfConfirmationsOfIncomingTransaction()) {
-                                request.setRemovalConditionForIncomingTransaction();
-                            }
-                        } else {
-                            if (numberOfConfirmations >= request.getRemoveAfterNumberOfConfirmationsOfOutgoingTransaction()) {
-                                request.setRemovalConditionForOutgoingTransaction();
-                            }
-                        }
-                        if (request.isRemovalCondition()) {
+
+                        if (performConfirmation) {
                             int previousState = request.getState();
-                            request.setState(PaymentRequest.STATE_REMOVED);
-                            stopListening();
-                            fireStateChanged(request,previousState);
+                            request.setState(PaymentRequest.STATE_SEEN_IN_BLOCK_CHAIN);
+                            fireStateChanged(request, previousState);
+                        }
+                    }
+
+                    if (request.getState() == PaymentRequest.STATE_SEEN_IN_BLOCK_CHAIN) {
+                        if (numberOfConfirmations > 0) {
+
+                            BitcoindRpcClient.Transaction transaction = (BitcoindRpcClient.Transaction) tag;
+                            IPaymentRequestListener.Direction direction = IPaymentRequestListener.Direction.INCOMING;
+                            if (hasHashOfOne(transaction.raw(), outgoingTransactions)) {
+                                direction = IPaymentRequestListener.Direction.OUTGOING;
+                            }
+                            fireNumberOfConfirmationsChanged(request, numberOfConfirmations, direction);
+                            // transaction is waiting to be removed
+                            if (direction == IPaymentRequestListener.Direction.INCOMING) {
+                                if (numberOfConfirmations >= request
+                                        .getRemoveAfterNumberOfConfirmationsOfIncomingTransaction()) {
+                                    request.setRemovalConditionForIncomingTransaction();
+                                }
+                            } else {
+                                if (numberOfConfirmations >= request
+                                        .getRemoveAfterNumberOfConfirmationsOfOutgoingTransaction()) {
+                                    request.setRemovalConditionForOutgoingTransaction();
+                                }
+                            }
+                            if (request.isRemovalCondition()) {
+                                int previousState = request.getState();
+                                request.setState(PaymentRequest.STATE_REMOVED);
+                                stopListening();
+                                fireStateChanged(request, previousState);
+                            }
                         }
                     }
                 }
+            } catch (Exception ex) {
+                log.error(ex.getMessage());
+                System.out.println(ex.getMessage());
             }
         }
 
@@ -445,7 +456,7 @@ public abstract class AbstractRPCPaymentSupport implements IPaymentSupport{
         getWatcher(client).addTransaction(cryptoCurrency,txId,l,tag);
     }
 
-    private void startWatchingAddress(RPCClient client, String cryptoCurrency, String address, IBlockchainWatcherAddressListener l, Object tag) {
+    protected void startWatchingAddress(RPCClient client, String cryptoCurrency, String address, IBlockchainWatcherAddressListener l, Object tag) {
         getWatcher(client).addAddress(cryptoCurrency,address,l,tag);
     }
 

@@ -35,15 +35,15 @@ import java.util.HashSet;
 import java.util.Set;
 import java.lang.reflect.Field;
 
-public class SmartCashRateSource implements IRateSource{
+public class SmartCashRateSource implements IRateSource {
     private static final Logger log = LoggerFactory.getLogger(SmartCashRateSource.class);
 
     private String preferedFiatCurrency;
     private ISmartCashAPI api;
 
-    private static HashMap<String,BigDecimal> rateAmounts = new HashMap<String, BigDecimal>();
-    private static HashMap<String,Long> rateTimes = new HashMap<String, Long>();
-    private static final long MAXIMUM_ALLOWED_TIME_OFFSET = 30 * 1000; //30sec
+    private static HashMap<String, BigDecimal> rateAmounts = new HashMap<String, BigDecimal>();
+    private static HashMap<String, Long> rateTimes = new HashMap<String, Long>();
+    private static final long MAXIMUM_ALLOWED_TIME_OFFSET = 30 * 1000; // 30sec
 
     public SmartCashRateSource(String preferedFiatCurrency) {
 
@@ -84,26 +84,26 @@ public class SmartCashRateSource implements IRateSource{
     @Override
     public BigDecimal getExchangeRateLast(String cryptoCurrency, String fiatCurrency) {
 
-        String key = cryptoCurrency +"_" + fiatCurrency;
+        String key = cryptoCurrency + "_" + fiatCurrency;
         synchronized (rateAmounts) {
-            long now  = System.currentTimeMillis();
+            long now = System.currentTimeMillis();
             BigDecimal amount = rateAmounts.get(key);
             if (amount == null) {
                 BigDecimal result = getExchangeRateLastSync(cryptoCurrency, fiatCurrency);
                 log.debug("Called smartcash exchange for rate: " + key + " = " + result);
-                rateAmounts.put(key,result);
-                rateTimes.put(key,now+MAXIMUM_ALLOWED_TIME_OFFSET);
+                rateAmounts.put(key, result);
+                rateTimes.put(key, now + MAXIMUM_ALLOWED_TIME_OFFSET);
                 return result;
-            }else {
+            } else {
                 Long expirationTime = rateTimes.get(key);
                 if (expirationTime > now) {
                     return rateAmounts.get(key);
-                }else{
-                    //do the job;
+                } else {
+                    // do the job;
                     BigDecimal result = getExchangeRateLastSync(cryptoCurrency, fiatCurrency);
                     log.debug("Called smartcash exchange for rate: " + key + " = " + result);
-                    rateAmounts.put(key,result);
-                    rateTimes.put(key,now+MAXIMUM_ALLOWED_TIME_OFFSET);
+                    rateAmounts.put(key, result);
+                    rateTimes.put(key, now + MAXIMUM_ALLOWED_TIME_OFFSET);
                     return result;
                 }
             }
@@ -113,7 +113,7 @@ public class SmartCashRateSource implements IRateSource{
 
     private BigDecimal getExchangeRateLastSync(String cryptoCurrency, String fiatCurrency) {
         if (!Currencies.SMART.equalsIgnoreCase(cryptoCurrency)) {
-            return null; //unsupported currency
+            return null; // unsupported currency
         }
         APIResponse response = api.returnResponse();
 
