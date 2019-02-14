@@ -3,6 +3,8 @@
 dist/
 build/
 out/
+bin/
+.class
 .idea
 .gradle
 *.iml
@@ -13,3 +15,5 @@ install-libs.sh
 .project
 .classpath
 .settings/
+server_extensions_extra/bin/
+
