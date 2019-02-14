@@ -41,7 +41,7 @@ public class SmartcashExtension extends AbstractExtension {
 
     private static final Logger log = LoggerFactory.getLogger("batm.master.ExmoExchange");
 
-    private static IExchange exchange = null;
+    //private static IExchange exchange = null;
 
     private static IExtensionContext ctx;
 
@@ -63,6 +63,7 @@ public class SmartcashExtension extends AbstractExtension {
     @Override
     public IExchange createExchange(String paramString) throws ExchangeException 
     {
+        IExchange exchange = null;
         try {
             //SOMETIMES it comes NULL from the server
             if(paramString == null || paramString.isEmpty())
@@ -114,7 +115,7 @@ public class SmartcashExtension extends AbstractExtension {
             }
         } catch (ExchangeException ex) {
 
-            log.error("ERROR CRATE EXCHANGE " + ex.getMessage());
+            log.error("ERROR CREATE EXCHANGE " + ex.getMessage());
 
             if(ex.getStackTrace() != null){
                 ex.printStackTrace();
