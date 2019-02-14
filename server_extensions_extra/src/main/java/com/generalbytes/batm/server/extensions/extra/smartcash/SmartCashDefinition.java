@@ -21,11 +21,13 @@ import com.generalbytes.batm.server.extensions.CryptoCurrencyDefinition;
 import com.generalbytes.batm.server.extensions.Currencies;
 import com.generalbytes.batm.server.extensions.payment.IPaymentSupport;
 
-public class SmartCashDefinition extends CryptoCurrencyDefinition{
+public class SmartCashDefinition extends CryptoCurrencyDefinition {
     private IPaymentSupport paymentSupport = new SmartCashPaymentSupport();
 
     public SmartCashDefinition() {
-        super(Currencies.SMART, "SmartCash", "", "");
+        // super(symbol, name, protocol, authorWebsiteURL);
+
+        super(Currencies.SMART, "SmartCash", "smartcash", "https://github.com/SmartCash/Core-Smart");
     }
 
     @Override

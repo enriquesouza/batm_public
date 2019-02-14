@@ -49,7 +49,7 @@ public class SmartCashWalletGenerator implements IPaperWalletGenerator {
 
         RPCClient rpcClient = null;
         try {
-            rpcClient = new RPCClient(SmartCashConstants.URL_RPC);
+            rpcClient = new RPCClient("SmartCashConstants.URL_RPC");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -59,19 +59,20 @@ public class SmartCashWalletGenerator implements IPaperWalletGenerator {
 
         byte[] content = ctx.createPaperWallet7ZIP(privateKey, address, oneTimePassword, cryptoCurrency);
 
-        //send wallet to customer
+        // send wallet to customer
         String messageText = "New wallet " + address + " use your onetime password to open the attachment.";
         String messageTextLang = readTemplate("/batm/config/template_wallet_" + userLanguage + ".txt");
         if (messageTextLang != null) {
             messageText = messageTextLang;
-        }else{
+        } else {
             String messageTextEN = readTemplate("/batm/config/template_wallet_en.txt");
             if (messageTextEN != null) {
                 messageText = messageTextEN;
             }
         }
 
-        return new SmartCashPaperWallet(cryptoCurrency, content, address, privateKey, messageText,"application/zip", "zip");
+        return new SmartCashPaperWallet(cryptoCurrency, content, address, privateKey, messageText, "application/zip",
+                "zip");
     }
 
     @SuppressWarnings("all")
@@ -79,7 +80,7 @@ public class SmartCashWalletGenerator implements IPaperWalletGenerator {
         File f = new File(templateFile);
         if (f.exists() && f.canRead()) {
             try {
-                String content = new String(Files.readAllBytes(Paths.get(templateFile)),"UTF-8");
+                String content = new String(Files.readAllBytes(Paths.get(templateFile)), "UTF-8");
                 return content;
             } catch (IOException e) {
                 log.error("readTemplate", e);

@@ -42,14 +42,14 @@ public class SmartCashAddressValidator implements ICryptoAddressValidator {
                 return false;
             }
             return true;
-        }else{
+        } else {
             return false;
         }
     }
 
     @Override
     public boolean isPaperWalletSupported() {
-        return true;
+        return false;
     }
 
     @Override

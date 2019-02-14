@@ -35,117 +35,22 @@ import org.slf4j.LoggerFactory;
 
 public class SmartcashExtension extends AbstractExtension {
 
-    private static final CryptoCurrencyDefinition DEFINITION = new SmartCashDefinition();
-
-    public static final String CURRENCY = Currencies.SMART;
-
     private static final Logger log = LoggerFactory.getLogger("batm.master.ExmoExchange");
-
-    //private static IExchange exchange = null;
-
-    private static IExtensionContext ctx;
+    private static final CryptoCurrencyDefinition DEFINITION = new SmartCashDefinition();
+    public static final String CURRENCY = Currencies.SMART;
 
     @Override
     public String getName() {
-        return "BATM Smartcash extension";
-    }
-
-    @Override
-    public void init(IExtensionContext ctx) {
-        super.init(ctx);
-        this.ctx = ctx;
-    }
-
-    public static IExtensionContext getExtensionContext() {
-        return ctx;
-    }
-
-    @Override
-    public IExchange createExchange(String paramString) throws ExchangeException 
-    {
-        IExchange exchange = null;
-        try {
-            //SOMETIMES it comes NULL from the server
-            if(paramString == null || paramString.isEmpty())
-                paramString = SmartCashConstants.EXCHANGE_PARAMS;
-            
-            log.info("SmartCash Extension - LOG - " + paramString);
-
-            if ((paramString != null) && (!paramString.trim().isEmpty())) {
-
-
-                log.info("PARAM CREATE EXCHANGE - " + paramString);
-
-                StringTokenizer paramTokenizer = new StringTokenizer(paramString, ":");
-
-                String prefix = paramTokenizer.nextToken();
-
-                log.info("PREFIX CREATE EXCHANGE - " + prefix);
-
-                if ("exmo".toLowerCase().contains(prefix.toLowerCase())) {
-
-
-                    String apiKey = paramTokenizer.nextToken();
-
-                    log.info("apiKey CREATE EXCHANGE - " + apiKey);
-
-                    String apiSecret = paramTokenizer.nextToken();
-                    
-                    log.info("apiSecret CREATE EXCHANGE - " + apiSecret);
-                    
-                    String preferredFiatCurrency = Currencies.EUR;
-                    
-                    log.info("preferredFiatCurrency CREATE EXCHANGE - " + preferredFiatCurrency);
-                    
-                    if (paramTokenizer.hasMoreTokens()) {
-                        preferredFiatCurrency = paramTokenizer.nextToken().toUpperCase();
-                    }
-
-                    exchange = new ExmoExchange(apiKey, apiSecret, preferredFiatCurrency);
-
-                    return exchange;
-
-
-                } else if ("hitbtc".equalsIgnoreCase(prefix)) {
-                    String preferredFiatCurrency = Currencies.USD;
-                    String apiKey = paramTokenizer.nextToken();
-                    String apiSecret = paramTokenizer.nextToken();
-                    return new HitbtcExchange(apiKey, apiSecret, preferredFiatCurrency);
-                }
-            }
-        } catch (ExchangeException ex) {
-
-            log.error("ERROR CREATE EXCHANGE " + ex.getMessage());
-
-            if(ex.getStackTrace() != null){
-                ex.printStackTrace();
-            }
-
-            throw new ExchangeException(ex.getMessage() + paramString);
-        }
-        return null;
+        return "BATM " + Currencies.SMART + " extension";
     }
 
     @Override
     public IWallet createWallet(String walletLogin) {
-
-        log.info("CREATE WALLET = " + walletLogin);
-        
-        //SOMETIMES it comes NULL from the server
-        if(walletLogin == null || walletLogin.isEmpty())
-            walletLogin = SmartCashConstants.WALLET_LOGIN;
-
         if (walletLogin != null && !walletLogin.trim().isEmpty()) {
             StringTokenizer st = new StringTokenizer(walletLogin, ":");
-
-            String walletType = "smartcashd";
-            if(walletLogin.contains("smartcashd"))
-                walletType = st.nextToken();
-
+            String walletType = st.nextToken();
             if ("smartcashd".equalsIgnoreCase(walletType)) {
-                // "smartcashd:protocol:user:password:ip:port:accountname"
-
-
+                // "bitcoind:protocol:user:password:ip:port:accountname"
 
                 String protocol = st.nextToken();
                 String username = st.nextToken();
@@ -160,46 +65,101 @@ public class SmartcashExtension extends AbstractExtension {
                 if (protocol != null && username != null && password != null && hostname != null && port != null
                         && accountName != null) {
                     String rpcURL = protocol + "://" + username + ":" + password + "@" + hostname + ":" + port;
-
-                    System.out.println(rpcURL);
-
-                    return new SmartcashRPCWallet(rpcURL, accountName);
+                    return new SmartCashRPCWallet(rpcURL, accountName);
                 }
             }
-			if ("smartdemo".equalsIgnoreCase(walletType)) {
-
-                String fiatCurrency = st.nextToken();
-                String walletAddress = "";
-                if (st.hasMoreTokens()) {
-                    walletAddress = st.nextToken();
-                }
-
-                if (fiatCurrency != null && walletAddress != null) {
-                    return new DummyExchangeAndWalletAndSource(fiatCurrency, Currencies.SMART, walletAddress);
-                }
-            }
-        } else {
-            log.error("CREATE WALLET ERROR - " + walletLogin + " - wallet login is null");
         }
         return null;
     }
 
     @Override
+    public Set<String> getSupportedCryptoCurrencies() {
+        Set<String> result = new HashSet<String>();
+        result.add(CURRENCY);
+        return result;
+    }
+
+    @Override
+    public Set<ICryptoCurrencyDefinition> getCryptoCurrencyDefinitions() {
+        Set<ICryptoCurrencyDefinition> result = new HashSet<>();
+        result.add(DEFINITION);
+        return result;
+    }
+
+    @Override
     public ICryptoAddressValidator createAddressValidator(String cryptoCurrency) {
-        if (Currencies.SMART.equalsIgnoreCase(cryptoCurrency)) {
+        if (CURRENCY.equalsIgnoreCase(cryptoCurrency)) {
             return new SmartCashAddressValidator();
         }
         return null;
     }
 
     @Override
+    public IPaperWalletGenerator createPaperWalletGenerator(String cryptoCurrency) {
+        return new SmartCashWalletGenerator("", ctx);
+    }
+
+    @Override
+    public IExchange createExchange(String paramString) throws ExchangeException {
+        IExchange exchange = null;
+        try {
+
+            log.info("SmartCash Extension - LOG - " + paramString);
+
+            if ((paramString != null) && (!paramString.trim().isEmpty())) {
+
+                log.info("PARAM CREATE EXCHANGE - " + paramString);
+
+                StringTokenizer paramTokenizer = new StringTokenizer(paramString, ":");
+
+                String prefix = paramTokenizer.nextToken();
+
+                log.info("PREFIX CREATE EXCHANGE - " + prefix);
+
+                if ("exmo".toLowerCase().contains(prefix.toLowerCase())) {
+
+                    String apiKey = paramTokenizer.nextToken();
+
+                    log.info("apiKey CREATE EXCHANGE - " + apiKey);
+
+                    String apiSecret = paramTokenizer.nextToken();
+
+                    log.info("apiSecret CREATE EXCHANGE - " + apiSecret);
+
+                    String preferredFiatCurrency = Currencies.EUR;
+
+                    log.info("preferredFiatCurrency CREATE EXCHANGE - " + preferredFiatCurrency);
+
+                    if (paramTokenizer.hasMoreTokens()) {
+                        preferredFiatCurrency = paramTokenizer.nextToken().toUpperCase();
+                    }
+
+                    exchange = new ExmoExchange(apiKey, apiSecret, preferredFiatCurrency);
+
+                    return exchange;
+
+                } else if ("hitbtc".equalsIgnoreCase(prefix)) {
+                    String preferredFiatCurrency = Currencies.USD;
+                    String apiKey = paramTokenizer.nextToken();
+                    String apiSecret = paramTokenizer.nextToken();
+                    return new HitbtcExchange(apiKey, apiSecret, preferredFiatCurrency);
+                }
+            }
+        } catch (ExchangeException ex) {
+
+            log.error("ERROR CREATE EXCHANGE " + ex.getMessage());
+
+            if (ex.getStackTrace() != null) {
+                ex.printStackTrace();
+            }
+
+            throw new ExchangeException(ex.getMessage() + paramString);
+        }
+        return null;
+    }
+
+    @Override
     public IRateSource createRateSource(String sourceLogin) {
-
-        //log.debug("SOURCE LOGIN = " + sourceLogin);
-
-        //SOMETIMES it comes NULL from the server
-        if(sourceLogin == null || sourceLogin.isEmpty())
-            sourceLogin = SmartCashConstants.RATE_SOURCE;
 
         if (sourceLogin != null && !sourceLogin.trim().isEmpty()) {
             StringTokenizer st = new StringTokenizer(sourceLogin, ":");
@@ -228,22 +188,5 @@ public class SmartcashExtension extends AbstractExtension {
 
         }
         return null;
-    }
-
-    @Override
-    public Set<String> getSupportedCryptoCurrencies() {
-        Set<String> result = new HashSet<String>();
-        result.add(Currencies.SMART);
-        return result;
-    }
-    @Override
-    public IPaperWalletGenerator createPaperWalletGenerator(String cryptoCurrency) {
-        return new SmartCashWalletGenerator("", ctx);
-    }
-    @Override
-    public Set<ICryptoCurrencyDefinition> getCryptoCurrencyDefinitions() {
-        Set<ICryptoCurrencyDefinition> result = new HashSet<>();
-        result.add(DEFINITION);
-        return result;
     }
 }

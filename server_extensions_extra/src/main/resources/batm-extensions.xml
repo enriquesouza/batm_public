@@ -538,6 +538,13 @@
             <param name="price" />
             <cryptocurrency>SMART</cryptocurrency>
         </ratesource>
+        <exchange prefix="exmo" name="Exmo Exchange">
+            <param name="apikey" />
+            <param name="apisecret" />
+            <param name="fiatcurrency" />
+            <cryptocurrency>BTC</cryptocurrency>
+            <cryptocurrency>SMART</cryptocurrency>
+        </exchange>
         <cryptologo cryptocurrency="SMART" file="smart.png"/>
     </extension>
     <extension class="com.generalbytes.batm.server.extensions.extra.startcoin.StartcoinExtension" >
