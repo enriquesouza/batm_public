@@ -95,11 +95,6 @@ public class SmartcashExtension extends AbstractExtension {
     }
 
     @Override
-    public IPaperWalletGenerator createPaperWalletGenerator(String cryptoCurrency) {
-        return new SmartCashWalletGenerator("", ctx);
-    }
-
-    @Override
     public IExchange createExchange(String paramString) throws ExchangeException {
         IExchange exchange = null;
         try {
