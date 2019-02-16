@@ -36,8 +36,6 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import si.mazi.rescu.HttpStatusIOException;
-
 public class ExmoExchange implements IExchangeAdvanced, IRateSourceAdvanced {
 
     private static final Logger log = LoggerFactory.getLogger("batm.master.ExmoExchange");
@@ -180,7 +178,7 @@ public class ExmoExchange implements IExchangeAdvanced, IRateSourceAdvanced {
             String description) throws ExchangeException {
 
         log.info("Exchange withdrawing {} {} to {}", amount, cryptoCurrency, destinationAddress);
-        
+
         DDOSUtils.waitForPossibleCall(getClass());
         Map<String, String> params = new HashMap<String, String>();
         params.put("amount", String.valueOf(amount));
@@ -245,6 +243,58 @@ public class ExmoExchange implements IExchangeAdvanced, IRateSourceAdvanced {
 
         return order;
 
+    }
+
+    private boolean isOrderStillOpen(String orderId, String currencyPair) {
+
+        boolean orderProcessed = false;
+
+        boolean orderFound = false;
+
+        JSONArray openOrders = getOpenOrders(currencyPair);
+
+        if (openOrders == null) {
+
+            orderProcessed = true;
+
+        } else {
+
+            DDOSUtils.waitForPossibleCall(getClass());
+
+            for (int i = 0; i < openOrders.length(); i++) {
+
+                JSONObject openOrder = openOrders.getJSONObject(i);
+
+                log.debug("openOrder = " + openOrder);
+
+                if (orderId.equals(openOrder.getString("order_id"))) {
+                    orderFound = true;
+                    break;
+                }
+            }
+        }
+
+        if (orderFound) {
+
+            log.debug("Waiting for order to be processed.");
+
+            try {
+                Thread.sleep(3000);
+
+                // don't get your ip address banned
+
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
+            }
+        } else {
+
+            orderProcessed = true;
+
+        }
+
+        return orderProcessed ? false : true;
     }
 
     @Override
@@ -594,7 +644,38 @@ public class ExmoExchange implements IExchangeAdvanced, IRateSourceAdvanced {
 
         @Override
         public boolean onDoStep() {
-            return (orderId != null && !orderId.isEmpty() && orderId.length() > 0);
+
+            if (orderId == null) {
+                log.debug("Giving up on waiting for trade to complete. Because it did not happen");
+                finished = true;
+                result = "Skipped";
+                return false;
+            }
+
+            // get open orders
+            boolean orderProcessed = false;
+            long checkTillTime = System.currentTimeMillis() + MAXIMUM_TIME_TO_WAIT_FOR_ORDER_TO_FINISH;
+            if (System.currentTimeMillis() > checkTillTime) {
+                log.debug("Giving up on waiting for trade " + orderId + " to complete");
+                finished = true;
+                return false;
+            }
+
+            log.debug("Open orders:");
+            boolean orderFound = isOrderStillOpen(orderId, cryptoCurrency + "_" + fiatCurrencyToUse);
+
+            if (orderFound) {
+                log.debug("Waiting for order to be processed.");
+            } else {
+                orderProcessed = true;
+            }
+
+            if (orderProcessed) {
+                result = orderId;
+                finished = true;
+            }
+
+            return result != null;
         }
 
         @Override
@@ -652,23 +733,43 @@ public class ExmoExchange implements IExchangeAdvanced, IRateSourceAdvanced {
 
             boolean hasOrder = (orderId != null && !orderId.isEmpty() && orderId.length() > 0);
 
-            result = "true";
-            finished = hasOrder;
-
             return hasOrder;
         }
 
         @Override
         public boolean onDoStep() {
 
-            log.debug("SELL TASK - onDoStep - SMARTCASH ORDERID" + orderId);
+            if (orderId == null) {
+                log.debug("Giving up on waiting for trade to complete. Because it did not happen");
+                finished = true;
+                result = "Skipped";
+                return false;
+            }
 
-            boolean hasOrder = (orderId != null && !orderId.isEmpty() && orderId.length() > 0);
+            // get open orders
+            boolean orderProcessed = false;
+            long checkTillTime = System.currentTimeMillis() + MAXIMUM_TIME_TO_WAIT_FOR_ORDER_TO_FINISH;
+            if (System.currentTimeMillis() > checkTillTime) {
+                log.debug("Giving up on waiting for trade " + orderId + " to complete");
+                finished = true;
+                return false;
+            }
 
-            result = "true";
-            finished = hasOrder;
+            log.debug("Open orders:");
+            boolean orderFound = isOrderStillOpen(orderId, cryptoCurrency + "_" + fiatCurrencyToUse);
 
-            return hasOrder;
+            if (orderFound) {
+                log.debug("Waiting for order to be processed.");
+            } else {
+                orderProcessed = true;
+            }
+
+            if (orderProcessed) {
+                result = orderId;
+                finished = true;
+            }
+
+            return result != null;
         }
 
         @Override
@@ -721,17 +822,15 @@ public class ExmoExchange implements IExchangeAdvanced, IRateSourceAdvanced {
     @Override
     public BigDecimal getExchangeRateForSell(String cryptoCurrency, String fiatCurrency) {
 
-        log.debug("GET Exchange SELL Rate : " + cryptoCurrency + fiatCurrency );
+        log.debug("GET Exchange SELL Rate : " + cryptoCurrency + fiatCurrency);
 
         BigDecimal rate = null;
-
 
         BigDecimal result = calculateSellPrice(cryptoCurrency, fiatCurrency, getMeasureCryptoAmount());
         if (result != null) {
             rate = result.divide(getMeasureCryptoAmount(), 2, BigDecimal.ROUND_DOWN);
         }
-        log.debug("GET Exchange SELL Rate : " + cryptoCurrency + fiatCurrency +  " ===> " + rate );
-
+        log.debug("GET Exchange SELL Rate : " + cryptoCurrency + fiatCurrency + " ===> " + rate);
 
         return rate;
     }
@@ -823,7 +922,7 @@ public class ExmoExchange implements IExchangeAdvanced, IRateSourceAdvanced {
     @Override
     public BigDecimal calculateSellPrice(String cryptoCurrency, String fiatCurrency, BigDecimal cryptoAmount) {
 
-        log.debug("Calculate SELL PRICE : " + cryptoCurrency + fiatCurrency );
+        log.debug("Calculate SELL PRICE : " + cryptoCurrency + fiatCurrency);
 
         String currencyPair = cryptoCurrency + "_" + fiatCurrency;
 
