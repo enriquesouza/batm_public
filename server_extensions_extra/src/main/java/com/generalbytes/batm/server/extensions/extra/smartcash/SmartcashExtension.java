@@ -184,4 +184,13 @@ public class SmartcashExtension extends AbstractExtension {
         }
         return null;
     }
+
+    @Override
+    public IPaperWalletGenerator createPaperWalletGenerator(String cryptoCurrency) {
+        log.info("INFO - SMART - PAPER WALLET");
+        if (CURRENCY.equalsIgnoreCase(cryptoCurrency)) {
+            return new SmartCashWalletGenerator("", ctx);
+        }
+        return null;
+    }
 }
