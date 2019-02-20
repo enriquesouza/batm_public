@@ -44,7 +44,7 @@ public class BitcoinCashExtension extends AbstractExtension {
             StringTokenizer st = new StringTokenizer(walletLogin, ":");
             String walletType = st.nextToken();
             if ("bitcoincashd".equalsIgnoreCase(walletType)) {
-                //"bitcoind:protocol:user:password:ip:port:accountname"
+                // "bitcoind:protocol:user:password:ip:port:accountname"
 
                 String protocol = st.nextToken();
                 String username = st.nextToken();
@@ -56,8 +56,8 @@ public class BitcoinCashExtension extends AbstractExtension {
                     accountName = st.nextToken();
                 }
 
-
-                if (protocol != null && username != null && password != null && hostname != null && port != null && accountName != null) {
+                if (protocol != null && username != null && password != null && hostname != null && port != null
+                        && accountName != null) {
                     String rpcURL = protocol + "://" + username + ":" + password + "@" + hostname + ":" + port;
                     return new BitcoinCashRPCWallet(rpcURL, accountName);
                 }
@@ -90,6 +90,12 @@ public class BitcoinCashExtension extends AbstractExtension {
 
     @Override
     public IPaperWalletGenerator createPaperWalletGenerator(String cryptoCurrency) {
-        return new BitcoinCashWalletGenerator("qqqq", ctx);
+
+        if (CURRENCY.equalsIgnoreCase(cryptoCurrency)) {
+            return new BitcoinCashWalletGenerator("qqqq", ctx);
+        }
+
+        return null;
+
     }
 }
