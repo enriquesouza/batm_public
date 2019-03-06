@@ -17,24 +17,16 @@
  ************************************************************************************/
 package com.generalbytes.batm.server.extensions.extra.smartcash;
 
+import java.math.BigDecimal;
+import java.util.concurrent.TimeUnit;
+
 import com.generalbytes.batm.server.extensions.Currencies;
 import com.generalbytes.batm.server.extensions.ICryptoAddressValidator;
-import com.generalbytes.batm.server.extensions.IWallet;
 import com.generalbytes.batm.server.extensions.extra.bitcoincash.test.PRS;
 import com.generalbytes.batm.server.extensions.extra.common.AbstractRPCPaymentSupport;
 import com.generalbytes.batm.server.extensions.extra.common.RPCClient;
 import com.generalbytes.batm.server.extensions.payment.IPaymentRequestListener;
-import com.generalbytes.batm.server.extensions.payment.IPaymentRequestSpecification;
 import com.generalbytes.batm.server.extensions.payment.PaymentRequest;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import wf.bitcoin.javabitcoindrpcclient.BitcoinRPCException;
 
 public class SmartCashPaymentSupport extends AbstractRPCPaymentSupport {
 
@@ -44,8 +36,8 @@ public class SmartCashPaymentSupport extends AbstractRPCPaymentSupport {
     private static final long MAXIMUM_WATCHING_TIME_MILLIS = TimeUnit.DAYS.toMillis(3); // 3 days (exactly plus Sell
                                                                                         // Offer Expiration 5-120
                                                                                         // minutes)
-    private static final BigDecimal TOLERANCE = new BigDecimal("0.0002"); // Received amount should be cryptoTotalToSend
-                                                                          // +- tolerance
+    private static final BigDecimal TOLERANCE = new BigDecimal("100"); // Received amount should be cryptoTotalToSend
+                                                                       // +- tolerance
 
     @Override
     public String getCurrency() {
@@ -79,23 +71,13 @@ public class SmartCashPaymentSupport extends AbstractRPCPaymentSupport {
 
     @Override
     public int calculateTransactionSize(int numberOfInputs, int numberOfOutputs) {
-        return (numberOfInputs * 149) + (numberOfOutputs * 34) + 10;
+        return ((numberOfInputs * 148) + (numberOfOutputs * 34) + 19) / 1024;
     }
 
     @Override
     public BigDecimal calculateTxFee(int numberOfInputs, int numberOfOutputs, RPCClient client) {
-        final int transactionSize = calculateTransactionSize(numberOfInputs, numberOfOutputs);
-        try {
-            BigDecimal estimate = new BigDecimal(client.getEstimateFee(2)); // sumcoind must be run with
-                                                                            // -deprecatedrpc=estimatefee
-            if (BigDecimal.ZERO.compareTo(estimate) == 0 || estimate.compareTo(new BigDecimal("-1")) == 0) {
-                return getMinimumNetworkFee(client);
-            }
-            return estimate.divide(new BigDecimal("1000"), RoundingMode.UP).multiply(new BigDecimal(transactionSize));
-        } catch (BitcoinRPCException e) {
-            e.printStackTrace();
-        }
-        return null;
+        double fee = (((numberOfInputs * 148) + (numberOfOutputs * 34) + 19) / 1024D) * 0.001D;
+        return new BigDecimal(fee);
     }
 
     public static void main(String[] args) {

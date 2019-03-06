@@ -25,20 +25,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SmartCashAddressValidator implements ICryptoAddressValidator {
+    private static final String ERROR = "Error";
+    private static final String SMARTCASH = "smartcash:";
+    private static final String S = "S";
     private static final Logger log = LoggerFactory.getLogger("batm.master.extensions.SmartcashAddressValidator");
 
     @Override
     public boolean isAddressValid(String address) {
-        String optionalPrefix = "smartcash:";
+        String optionalPrefix = SMARTCASH;
         if (address.startsWith(optionalPrefix)) {
             address = address.substring(optionalPrefix.length(), address.length());
         }
-        if (address.startsWith("S")) {
+        if (address.startsWith(S)) {
             try {
                 Base58.decodeToBigInteger(address);
                 Base58.decodeChecked(address);
             } catch (AddressFormatException e) {
-                log.error("Error", e);
+                log.error(ERROR, e);
                 return false;
             }
             return true;

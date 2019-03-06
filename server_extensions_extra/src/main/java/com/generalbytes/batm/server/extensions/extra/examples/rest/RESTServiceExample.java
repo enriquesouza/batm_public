@@ -19,11 +19,15 @@ package com.generalbytes.batm.server.extensions.extra.examples.rest;
 
 import com.generalbytes.batm.server.extensions.IExtensionContext;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,19 +38,24 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import okhttp3.*;
+
 /**
  * REST service implementation class that uses JSR-000311 JAX-RS
  */
 @Path("/")
 public class RESTServiceExample {
     private static final Logger log = LoggerFactory.getLogger("batm.master.extensions.RESTServiceExample");
+
     @GET
     @Path("/helloworld")
     @Produces(MediaType.APPLICATION_JSON)
     /**
-     * Returns JSON response on following URL https://localhost:7743/extensions/example/helloworld
+     * Returns JSON response on following URL
+     * https://localhost:7743/extensions/example/helloworld
      */
-    public Object helloWorld(@Context HttpServletRequest request, @Context HttpServletResponse response, @QueryParam("serial_number") String serialNumber) {
+    public Object helloWorld(@Context HttpServletRequest request, @Context HttpServletResponse response,
+            @QueryParam("serial_number") String serialNumber) {
         String serverVersion = RESTExampleExtension.getExtensionContext().getServerVersion();
         return new MyExtensionExampleResponse(0, "Server version is: " + serverVersion);
     }
@@ -55,7 +64,8 @@ public class RESTServiceExample {
     @Path("/terminals")
     @Produces(MediaType.APPLICATION_JSON)
     /**
-     * Returns list of terminals and their locations plus other information. https://localhost:7743/extensions/example/terminals
+     * Returns list of terminals and their locations plus other information.
+     * https://localhost:7743/extensions/example/terminals
      */
     public Object terminals() {
         try {
@@ -70,7 +80,8 @@ public class RESTServiceExample {
     @Path("/cashboxes")
     @Produces(MediaType.APPLICATION_JSON)
     /**
-     * Returns terminal cashboxes contains https://localhost:7743/extensions/example/cashboxes?serial_number=BT300045
+     * Returns terminal cashboxes contains
+     * https://localhost:7743/extensions/example/cashboxes?serial_number=BT300045
      */
     public Object cashboxes(@QueryParam("serial_number") String serialNumber) {
         if (serialNumber == null) {
@@ -88,33 +99,92 @@ public class RESTServiceExample {
     @Path("/terminals_with_available_cash")
     @Produces(MediaType.APPLICATION_JSON)
     /**
-     * Returns list of terminals that have specified cash available for sell transactions. https://localhost:7743/extensions/example/terminals_with_available_cash?amount=100&fiat_currency=USD
+     * Returns list of terminals that have specified cash available for sell
+     * transactions.
+     * https://localhost:7743/extensions/example/terminals_with_available_cash?amount=100&fiat_currency=USD
      */
-    public Object terminalsWithAvailableCash( @QueryParam("amount") String amount, @QueryParam("fiat_currency") String fiatCurrency) {
+    public Object terminalsWithAvailableCash(@QueryParam("amount") String amount,
+            @QueryParam("fiat_currency") String fiatCurrency) {
         if (amount == null || fiatCurrency == null) {
             return "amount and fiat_currency has to be set.";
         }
         try {
-            return RESTExampleExtension.getExtensionContext().findTerminalsWithAvailableCashForSell(new BigDecimal(amount), fiatCurrency,null);
+            return RESTExampleExtension.getExtensionContext()
+                    .findTerminalsWithAvailableCashForSell(new BigDecimal(amount), fiatCurrency, null);
         } catch (Throwable e) {
             log.error("Error", e);
         }
         return "ERROR";
     }
 
+    private double getProfitSell(String cryptoCurrency) {
+
+        String strResponse = null;
+        Request request = null;
+        Response response = null;
+        OkHttpClient client = null;
+        double profit = 0;
+
+        String URL = "http://localhost:3000/config";
+        JSONArray res = null;
+
+        try {
+
+            client = new OkHttpClient();
+            request = new Request.Builder().url(URL).build();
+            response = client.newCall(request).execute();
+            strResponse = response.body().string();
+
+            if (strResponse != null && !strResponse.isEmpty()) {
+
+                res = new JSONArray(strResponse);
+
+                for (int i = 0; i < res.length(); i++) {
+
+                    JSONObject obj = res.getJSONObject(i);
+
+                    if (!obj.isNull("profitsell")) {
+                        Double aux = obj.getDouble("profitsell");
+                        if (aux > profit)
+                            profit = aux;
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+
+            System.err.println("Request fail: " + e.toString());
+            log.error("ERRO PROFIT SELL" + e.getMessage());
+            profit = 0;
+        }
+
+        return profit;
+    }
+
     @GET
     @Path("/calculate_crypto_amount")
     @Produces(MediaType.APPLICATION_JSON)
     /**
-     * Returns crypto amount for specified fiat amount using crypto settings of specified terminal
+     * Returns crypto amount for specified fiat amount using crypto settings of
+     * specified terminal
      * https://localhost:7743/extensions/builtin/calculate_crypto_amount?serial_number=BT300511&fiat_currency=USD&crypto_currency=LTC&fiat_amount=100
      */
-    public Object calculateCryptoAmount(@QueryParam("serial_number") String serialNumber, @QueryParam("crypto_currency") String cryptoCurrency, @QueryParam("fiat_amount") String fiatAmount , @QueryParam("fiat_currency") String fiatCurrency) {
+    public Object calculateCryptoAmount(@QueryParam("serial_number") String serialNumber,
+            @QueryParam("crypto_currency") String cryptoCurrency, @QueryParam("fiat_amount") String fiatAmount,
+            @QueryParam("fiat_currency") String fiatCurrency) {
         if (serialNumber == null || fiatCurrency == null || cryptoCurrency == null || fiatAmount == null) {
             return "missing some parameters";
         }
         try {
-            return RESTExampleExtension.getExtensionContext().calculateCryptoAmounts(serialNumber, Arrays.<String>asList(new String[]{cryptoCurrency}), new BigDecimal(fiatAmount), fiatCurrency, IExtensionContext.DIRECTION_BUY_CRYPTO,null,null);
+
+            double amount = Double.valueOf(fiatAmount);
+            double ptcProfitSell = getProfitSell(cryptoCurrency);
+            double amountOfProfitSell = amount * ptcProfitSell / 100;
+            double amountWithProfit = amount + amountOfProfitSell;
+
+            return RESTExampleExtension.getExtensionContext().calculateCryptoAmounts(serialNumber,
+                    Arrays.<String>asList(new String[] { cryptoCurrency }), new BigDecimal(amountWithProfit),
+                    fiatCurrency, IExtensionContext.DIRECTION_BUY_CRYPTO, null, null);
         } catch (Throwable e) {
             log.error("Error", e);
         }
@@ -129,11 +199,12 @@ public class RESTServiceExample {
      * https://localhost:7743/extensions/builtin/get_exchange_rate_info?serial_number=BT300511
      */
     public Object getExchangeRateInfo(@QueryParam("serial_number") String serialNumber) {
-        if (serialNumber == null ) {
+        if (serialNumber == null) {
             return "missing serial_number parameter";
         }
         try {
-            return RESTExampleExtension.getExtensionContext().getExchangeRateInfo(serialNumber, IExtensionContext.DIRECTION_BUY_CRYPTO | IExtensionContext.DIRECTION_SELL_CRYPTO);
+            return RESTExampleExtension.getExtensionContext().getExchangeRateInfo(serialNumber,
+                    IExtensionContext.DIRECTION_BUY_CRYPTO | IExtensionContext.DIRECTION_SELL_CRYPTO);
         } catch (Throwable e) {
             log.error("Error", e);
         }
@@ -146,12 +217,18 @@ public class RESTServiceExample {
     /**
      * Creates sell transaction.
      */
-    public Object sellCrypto(@QueryParam("serial_number") String serialNumber, @QueryParam("fiat_amount") BigDecimal fiatAmount, @QueryParam("fiat_currency") String fiatCurrency, @QueryParam("crypto_amount") BigDecimal cryptoAmount, @QueryParam("crypto_currency") String cryptoCurrency, @QueryParam("identity_public_id") String identityPublicId, @QueryParam("discount_code") String discountCode ) {
-        if (serialNumber == null || fiatAmount == null || fiatCurrency == null || cryptoAmount == null || cryptoCurrency == null) {
+    public Object sellCrypto(@QueryParam("serial_number") String serialNumber,
+            @QueryParam("fiat_amount") BigDecimal fiatAmount, @QueryParam("fiat_currency") String fiatCurrency,
+            @QueryParam("crypto_amount") BigDecimal cryptoAmount, @QueryParam("crypto_currency") String cryptoCurrency,
+            @QueryParam("identity_public_id") String identityPublicId,
+            @QueryParam("discount_code") String discountCode) {
+        if (serialNumber == null || fiatAmount == null || fiatCurrency == null || cryptoAmount == null
+                || cryptoCurrency == null) {
             return "missing parameters";
         }
         try {
-            return RESTExampleExtension.getExtensionContext().sellCrypto(serialNumber, fiatAmount, fiatCurrency, cryptoAmount, cryptoCurrency, identityPublicId, discountCode);
+            return RESTExampleExtension.getExtensionContext().sellCrypto(serialNumber, fiatAmount, fiatCurrency,
+                    cryptoAmount, cryptoCurrency, identityPublicId, discountCode);
         } catch (Throwable e) {
             log.error("Error", e);
         }

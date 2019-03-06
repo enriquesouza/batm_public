@@ -15,25 +15,19 @@
 
 package com.generalbytes.batm.server.extensions.extra.smartcash.sources.smartcash;
 
-import com.generalbytes.batm.server.extensions.Currencies;
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.generalbytes.batm.server.extensions.Currencies;
 import com.generalbytes.batm.server.extensions.IRateSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import si.mazi.rescu.ClientConfig;
 import si.mazi.rescu.RestProxyFactory;
-import si.mazi.rescu.serialization.jackson.DefaultJacksonObjectMapperFactory;
-import si.mazi.rescu.serialization.jackson.JacksonObjectMapperFactory;
-
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.lang.reflect.Field;
 
 public class SmartCashRateSource implements IRateSource {
     private static final Logger log = LoggerFactory.getLogger(SmartCashRateSource.class);

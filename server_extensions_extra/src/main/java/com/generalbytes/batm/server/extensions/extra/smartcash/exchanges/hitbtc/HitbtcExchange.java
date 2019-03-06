@@ -1,15 +1,12 @@
 package com.generalbytes.batm.server.extensions.extra.smartcash.exchanges.hitbtc;
 
-import com.generalbytes.batm.server.extensions.Currencies;
-import com.generalbytes.batm.server.extensions.Currencies;
-import com.generalbytes.batm.server.extensions.extra.bitcoin.exchanges.XChangeExchange;
-import org.knowm.xchange.ExchangeSpecification;
-import org.knowm.xchange.dto.account.AccountInfo;
-import org.knowm.xchange.dto.account.Wallet;
-
-import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
+
+import com.generalbytes.batm.server.extensions.Currencies;
+import com.generalbytes.batm.server.extensions.extra.bitcoin.exchanges.XChangeExchange;
+
+import org.knowm.xchange.ExchangeSpecification;
 
 public class HitbtcExchange extends XChangeExchange {
 
@@ -20,7 +17,6 @@ public class HitbtcExchange extends XChangeExchange {
     public HitbtcExchange(String clientKey, String clientSecret, String preferredFiatCurrency) {
         super(getSpecification(clientKey, clientSecret), preferredFiatCurrency);
     }
-
 
     private static ExchangeSpecification getDefaultSpecification() {
         return new org.knowm.xchange.hitbtc.v2.HitbtcExchange().getDefaultExchangeSpecification();
@@ -60,11 +56,12 @@ public class HitbtcExchange extends XChangeExchange {
         return 10;
     }
 
-//    public static void main(String[] args) {
-//        HitbtcExchange xch = new HitbtcExchange("", "", "USD");
-//        System.out.println(xch.getDepositAddress("XMR"));
-//        System.out.println(xch.getExchangeRateForSell("XMR", "USD"));
-//        //System.out.println(xch.sellCoins(BigDecimal.TEN, "XMR", "USD", ""));
-//        System.out.println(xch.sendCoins("86didNu7QQdJvm1CAxpUCy9rJr7AcRLdz1xzSMEFio8DVknAu3PoLkY7VNoDBFdM2ZZ4kzfKyrHEUHrjRauXwSZGJ7SA7Ki", BigDecimal.TEN, "XMR", ""));
-//    }
+    // public static void main(String[] args) {
+    // HitbtcExchange xch = new HitbtcExchange("", "", "USD");
+    // System.out.println(xch.getDepositAddress("XMR"));
+    // System.out.println(xch.getExchangeRateForSell("XMR", "USD"));
+    // //System.out.println(xch.sellCoins(BigDecimal.TEN, "XMR", "USD", ""));
+    // System.out.println(xch.sendCoins("86didNu7QQdJvm1CAxpUCy9rJr7AcRLdz1xzSMEFio8DVknAu3PoLkY7VNoDBFdM2ZZ4kzfKyrHEUHrjRauXwSZGJ7SA7Ki",
+    // BigDecimal.TEN, "XMR", ""));
+    // }
 }
