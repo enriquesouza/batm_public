@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2016 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -17,6 +17,8 @@
  ************************************************************************************/
 package com.generalbytes.batm.server.extensions.extra.electra;
 
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
+import com.generalbytes.batm.common.currencies.FiatCurrency;
 import com.generalbytes.batm.server.extensions.*;
 import com.generalbytes.batm.server.extensions.FixPriceRateSource;
 import com.generalbytes.batm.server.extensions.extra.dash.sources.coinmarketcap.CoinmarketcapRateSource;
@@ -34,7 +36,7 @@ public class ElectraExtension extends AbstractExtension{
     }
 
     @Override
-    public IWallet createWallet(String walletLogin) {
+    public IWallet createWallet(String walletLogin, String tunnelPassword) {
         if (walletLogin !=null && !walletLogin.trim().isEmpty()) {
             StringTokenizer st = new StringTokenizer(walletLogin,":");
             String walletType = st.nextToken();
@@ -67,7 +69,7 @@ public class ElectraExtension extends AbstractExtension{
                 }
 
                 if (fiatCurrency != null && walletAddress != null) {
-                    return new DummyExchangeAndWalletAndSource(fiatCurrency, Currencies.ECA, walletAddress);
+                    return new DummyExchangeAndWalletAndSource(fiatCurrency, CryptoCurrency.ECA.getCode(), walletAddress);
                 }
             }
         }
@@ -76,7 +78,7 @@ public class ElectraExtension extends AbstractExtension{
 
     @Override
     public ICryptoAddressValidator createAddressValidator(String cryptoCurrency) {
-        if (Currencies.ECA.equalsIgnoreCase(cryptoCurrency)) {
+        if (CryptoCurrency.ECA.getCode().equalsIgnoreCase(cryptoCurrency)) {
             return new ElectraAddressValidator();
         }
         return null;
@@ -95,14 +97,14 @@ public class ElectraExtension extends AbstractExtension{
                     } catch (Throwable e) {
                     }
                 }
-                String preferedFiatCurrency = Currencies.USD;
+                String preferedFiatCurrency = FiatCurrency.USD.getCode();
                 if (st.hasMoreTokens()) {
                     preferedFiatCurrency = st.nextToken().toUpperCase();
                 }
                 return new FixPriceRateSource(rate, preferedFiatCurrency);
             }
             else if ("coinmarketcap".equalsIgnoreCase(exchangeType)) {
-                String preferredFiatCurrency = Currencies.USD;
+                String preferredFiatCurrency = FiatCurrency.USD.getCode();
                 String apiKey = null;
                 if (st.hasMoreTokens()) {
                     preferredFiatCurrency = st.nextToken().toUpperCase();
@@ -118,7 +120,7 @@ public class ElectraExtension extends AbstractExtension{
     @Override
     public Set<String> getSupportedCryptoCurrencies() {
         Set<String> result = new HashSet<String>();
-        result.add(Currencies.ECA);
+        result.add(CryptoCurrency.ECA.getCode());
         return result;
     }
 }

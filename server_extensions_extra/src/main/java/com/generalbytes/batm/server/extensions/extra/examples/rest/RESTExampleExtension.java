@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2018 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -21,7 +21,9 @@ import com.generalbytes.batm.server.extensions.AbstractExtension;
 import com.generalbytes.batm.server.extensions.IExtensionContext;
 import com.generalbytes.batm.server.extensions.IRestService;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -57,6 +59,11 @@ public class RESTExampleExtension extends AbstractExtension{
             @Override
             public Class getImplementation() {
                 return RESTServiceExample.class;
+            }
+
+            @Override
+            public List<Class> getFilters() {
+                return Arrays.asList(ServletFilterExample.class);
             }
         });
 

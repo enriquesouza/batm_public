@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2018 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -61,6 +61,7 @@ public interface ITransactionDetails {
     int BUY_ERROR_FINGERPRINT_UNKNOWN = 12;
     int BUY_ERROR_FEE_GREATER_THAN_AMOUNT = 13;
     int BUY_ERROR_PUBLIC_ID_UNKNOWN = 19;
+    int BUY_ERROR_NOT_APPROVED = 20;
 
     int SELL_ERROR_NO_ERROR = 0;
     int SELL_ERROR_INVALID_PARAMETERS = 1;
@@ -74,6 +75,10 @@ public interface ITransactionDetails {
     int SELL_ERROR_NOT_ENOUGH_COINS_ON_EXCHANGE = 15;
     int SELL_ERROR_EXCHANGE_SELL = 16;
     int SELL_ERROR_PAYMENT_INVALID = 17;
+    int SELL_ERROR_DISABLED_SELL = 20;
+    int SELL_ERROR_NOT_APPROVED = 21;
+    int SELL_ERROR_WITHDRAWAL_PROBLEM = 22;
+    int SELL_ERROR_WITHDRAWAL_NOT_ALLOWED = 23;
 
     int WITHDRAW_ERROR_NO_ERROR = 0;
     int WITHDRAW_ERROR_INVALID_PARAMETERS = 1;
@@ -82,6 +87,8 @@ public interface ITransactionDetails {
     int WITHDRAW_ERROR_FINGERPRINT_UNKNOWN = 12;
     int WITHDRAW_ERROR_NOT_ENOUGH_CASH = 13;
     int WITHDRAW_ERROR_PHONE_NUMBER_UNKNOWN = 18;
+    int WITHDRAW_ERROR_NOT_APPROVED = 19;
+    int WITHDRAW_ERROR_CASH_DISPENSING_FAILED = 22;
 
     /**
      * Server time of the transaction

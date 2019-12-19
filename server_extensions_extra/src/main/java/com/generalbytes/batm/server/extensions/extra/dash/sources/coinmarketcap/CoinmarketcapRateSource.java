@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2018 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -17,7 +17,8 @@
  ************************************************************************************/
 package com.generalbytes.batm.server.extensions.extra.dash.sources.coinmarketcap;
 
-import com.generalbytes.batm.server.extensions.Currencies;
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
+import com.generalbytes.batm.common.currencies.FiatCurrency;
 import com.generalbytes.batm.server.extensions.IRateSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,66 +31,72 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-/**
- * Created by kkyovsky on 11/29/17.
- *
- * Modified by sidhujag on 6/3/2018
- */
 
 public class CoinmarketcapRateSource implements IRateSource {
     private static final Logger log = LoggerFactory.getLogger(CoinmarketcapRateSource.class);
 
     private final ICoinmarketcapAPI api;
-    private String preferredFiatCurrency = Currencies.USD;
+    private String preferredFiatCurrency = FiatCurrency.USD.getCode();
     private final String apiKey;
 
     public CoinmarketcapRateSource(String apiKey, String preferedFiatCurrency) {
         api = RestProxyFactory.createProxy(ICoinmarketcapAPI.class, "https://pro-api.coinmarketcap.com"); // https://sandbox-api.coinmarketcap.com
-        this.apiKey = Objects.requireNonNull(apiKey, "CoinmarketcapRateSource API key must be configured, see https://coinmarketcap.com/api/");
+        this.apiKey = apiKey;
+        if (apiKey == null) {
+            log.warn("CoinmarketcapRateSource API key must be configured, see https://coinmarketcap.com/api/");
+        }
 
-        if (Currencies.EUR.equalsIgnoreCase(preferedFiatCurrency)) {
-            this.preferredFiatCurrency = Currencies.EUR;
+        if (FiatCurrency.EUR.getCode().equalsIgnoreCase(preferedFiatCurrency)) {
+            this.preferredFiatCurrency = FiatCurrency.EUR.getCode();
         }
-        if (Currencies.USD.equalsIgnoreCase(preferedFiatCurrency)) {
-            this.preferredFiatCurrency = Currencies.USD;
+        if (FiatCurrency.USD.getCode().equalsIgnoreCase(preferedFiatCurrency)) {
+            this.preferredFiatCurrency = FiatCurrency.USD.getCode();
         }
-        if (Currencies.CAD.equalsIgnoreCase(preferedFiatCurrency)) {
-            this.preferredFiatCurrency = Currencies.CAD;
+        if (FiatCurrency.CAD.getCode().equalsIgnoreCase(preferedFiatCurrency)) {
+            this.preferredFiatCurrency = FiatCurrency.CAD.getCode();
         }
-        if (Currencies.HKD.equalsIgnoreCase(preferedFiatCurrency)) {
-            this.preferredFiatCurrency = Currencies.HKD;
+        if (FiatCurrency.HKD.getCode().equalsIgnoreCase(preferedFiatCurrency)) {
+            this.preferredFiatCurrency = FiatCurrency.HKD.getCode();
         }
     }
 
     @Override
     public Set<String> getCryptoCurrencies() {
         Set<String> result = new HashSet<String>();
-        result.add(Currencies.ANT);
-        result.add(Currencies.BTC);
-        result.add(Currencies.SYS);
-        result.add(Currencies.BCH);
-        result.add(Currencies.BTX);
-        result.add(Currencies.LTC);
-        result.add(Currencies.ETH);
-        result.add(Currencies.DASH);
-        result.add(Currencies.XMR);
-        result.add(Currencies.PAC);
-        result.add(Currencies.POT);
-        result.add(Currencies.FLASH);
-        result.add(Currencies.BTCP);
-        result.add(Currencies.EFL);
-        result.add(Currencies.BSD);
-        result.add(Currencies.BTDX);
-        result.add(Currencies.MEC);
-        result.add(Currencies.BURST);
-        result.add(Currencies.DOGE);
-        result.add(Currencies.ECA);
-        result.add(Currencies.ANON);
-        result.add(Currencies.LSK);
-        result.add(Currencies.USDT);
-        result.add(Currencies.XZC);
-        result.add(Currencies.CLOAK);
-        result.add(Currencies.DAI);
+        result.add(CryptoCurrency.ANON.getCode());
+        result.add(CryptoCurrency.ANT.getCode());
+        result.add(CryptoCurrency.BAT.getCode());
+        result.add(CryptoCurrency.BCH.getCode());
+        result.add(CryptoCurrency.BSD.getCode());
+        result.add(CryptoCurrency.BTC.getCode());
+        result.add(CryptoCurrency.BTCP.getCode());
+        result.add(CryptoCurrency.BTDX.getCode());
+        result.add(CryptoCurrency.BTX.getCode());
+        result.add(CryptoCurrency.BURST.getCode());
+        result.add(CryptoCurrency.CLOAK.getCode());
+        result.add(CryptoCurrency.DAI.getCode());
+        result.add(CryptoCurrency.DASH.getCode());
+        result.add(CryptoCurrency.DOGE.getCode());
+        result.add(CryptoCurrency.ECA.getCode());
+        result.add(CryptoCurrency.EFL.getCode());
+        result.add(CryptoCurrency.ETH.getCode());
+        result.add(CryptoCurrency.EURS.getCode());
+        result.add(CryptoCurrency.FLASH.getCode());
+        result.add(CryptoCurrency.HATCH.getCode());
+        result.add(CryptoCurrency.LSK.getCode());
+        result.add(CryptoCurrency.LTC.getCode());
+        result.add(CryptoCurrency.MEC.getCode());
+        result.add(CryptoCurrency.MKR.getCode());
+        result.add(CryptoCurrency.MUE.getCode());
+        result.add(CryptoCurrency.PAC.getCode());
+        result.add(CryptoCurrency.POT.getCode());
+        result.add(CryptoCurrency.REP.getCode());
+        result.add(CryptoCurrency.SYS.getCode());
+        result.add(CryptoCurrency.USDS.getCode());
+        result.add(CryptoCurrency.USDT.getCode());
+        result.add(CryptoCurrency.XMR.getCode());
+        result.add(CryptoCurrency.XRP.getCode());
+        result.add(CryptoCurrency.XZC.getCode());
 
         return result;
     }
@@ -97,10 +104,10 @@ public class CoinmarketcapRateSource implements IRateSource {
     @Override
     public Set<String> getFiatCurrencies() {
         Set<String> result = new HashSet<String>();
-        result.add(Currencies.USD);
-        result.add(Currencies.CAD);
-        result.add(Currencies.EUR);
-        result.add(Currencies.HKD);
+        result.add(FiatCurrency.CAD.getCode());
+        result.add(FiatCurrency.EUR.getCode());
+        result.add(FiatCurrency.HKD.getCode());
+        result.add(FiatCurrency.USD.getCode());
         return result;
     }
 
@@ -113,6 +120,9 @@ public class CoinmarketcapRateSource implements IRateSource {
     @Override
     public BigDecimal getExchangeRateLast(String cryptoCurrency, String fiatCurrency) {
         if (!getFiatCurrencies().contains(fiatCurrency)) {
+            return null;
+        }
+        if(apiKey == null) {
             return null;
         }
 

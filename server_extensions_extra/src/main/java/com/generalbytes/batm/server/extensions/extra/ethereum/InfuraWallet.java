@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2018 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -17,7 +17,7 @@
  ************************************************************************************/
 package com.generalbytes.batm.server.extensions.extra.ethereum;
 
-import com.generalbytes.batm.server.extensions.Currencies;
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
 import com.generalbytes.batm.server.extensions.IWallet;
 
 import org.slf4j.Logger;
@@ -44,18 +44,15 @@ import java.util.concurrent.TimeoutException;
 import static org.web3j.utils.Convert.Unit.ETHER;
 
 public class InfuraWallet implements IWallet{
-    private String cryptoCurrency = Currencies.ETH;
+    private String cryptoCurrency = CryptoCurrency.ETH.getCode();
     private Credentials credentials;
-    private String apiKey;
     private Web3j w;
 
     private static final Logger log = LoggerFactory.getLogger(InfuraWallet.class);
 
-    public InfuraWallet(String apiKey, String mnemonicOrPassword) {
-        this.apiKey = apiKey;
-
+    public InfuraWallet(String projectId, String mnemonicOrPassword) {
         credentials = initCredentials(mnemonicOrPassword);
-        w = Web3j.build(new HttpService("https://mainnet.infura.io/v3/" + apiKey));
+        w = Web3j.build(new HttpService("https://mainnet.infura.io/v3/" + projectId));
     }
 
     private Credentials initCredentials(String mnemonicOrPassword) {

@@ -17,8 +17,8 @@
  ************************************************************************************/
 package com.generalbytes.batm.server.extensions.extra.smartcash;
 
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
 import com.generalbytes.batm.server.extensions.CryptoCurrencyDefinition;
-import com.generalbytes.batm.server.extensions.Currencies;
 import com.generalbytes.batm.server.extensions.payment.IPaymentSupport;
 
 public class SmartCashDefinition extends CryptoCurrencyDefinition {
@@ -26,8 +26,7 @@ public class SmartCashDefinition extends CryptoCurrencyDefinition {
 
     public SmartCashDefinition() {
         // super(symbol, name, protocol, authorWebsiteURL);
-
-        super(Currencies.SMART, "SmartCash", "smartcash", "https://github.com/SmartCash/Core-Smart");
+        super(CryptoCurrency.SMART.getCode(), "SmartCash", "smartcash", "https://github.com/SmartCash/Core-Smart");
     }
 
     @Override

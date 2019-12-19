@@ -26,7 +26,7 @@ import com.generalbytes.batm.server.extensions.IExtensionContext;
 import com.generalbytes.batm.server.extensions.IPaperWallet;
 import com.generalbytes.batm.server.extensions.IPaperWalletGenerator;
 
-import org.json.JSONObject;
+import org.json.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2016 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -38,6 +38,11 @@ public class CryptoCurrencyDefinition implements ICryptoCurrencyDefinition {
     @Override
     public String getSymbol() {
         return symbol;
+    }
+
+    @Override
+    public String getRateSourceSymbol() {
+        return getSymbol();
     }
 
     @Override

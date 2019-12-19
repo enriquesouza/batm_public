@@ -17,13 +17,13 @@
  ************************************************************************************/
 package com.generalbytes.batm.server.extensions.extra.smartcash;
 
-import com.generalbytes.batm.server.extensions.Currencies;
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
 import com.generalbytes.batm.server.extensions.extra.common.RPCWallet;
 
 //You need to have node running: i.e.:  bitcoind -rpcuser=rpcuser -rpcpassword=rpcpassword -rpcport=8332
 
 public class SmartCashRPCWallet extends RPCWallet {
     public SmartCashRPCWallet(String rpcURL, String accountName) {
-        super(rpcURL, accountName, Currencies.SMART);
+        super(rpcURL, accountName, CryptoCurrency.SMART.getCode());
     }
 }

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id=":server_extensions_extra:test" external.linked.project.path="$MODULE_DIR$/../../../server_extensions_extra" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="com.generalbytes.batm.public" external.system.module.type="sourceSet" external.system.module.version="1.0.7-SNAPSHOT" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
+    <output-test url="file://$MODULE_DIR$/../../../server_extensions_extra/out/test/classes" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../server_extensions_extra/src/test">
+      <sourceFolder url="file://$MODULE_DIR$/../../../server_extensions_extra/src/test/java" isTestSource="true" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="batm_public_enrique.server_extensions_extra.main" />
+    <orderEntry type="module" module-name="batm_public_enrique.server_extensions_api.main" />
+    <orderEntry type="module" module-name="batm_public_enrique.currencies.main" />
+    <orderEntry type="library" name="Gradle: com.github.Polve:JavaBitcoindRpcClient:860f5d735539ea52838efe3149c98b57f1decd7a" level="project" />
+    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.28" level="project" />
+    <orderEntry type="library" name="Gradle: com.github.mmazi:rescu:2.0.2" level="project" />
+    <orderEntry type="library" name="Gradle: javax.ws.rs:javax.ws.rs-api:2.1" level="project" />
+    <orderEntry type="library" name="Gradle: javax.servlet:javax.servlet-api:3.1.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.9.9" level="project" />
+    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.9.9" level="project" />
+    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.9.9" level="project" />
+    <orderEntry type="library" name="Gradle: org.knowm.xchange:xchange-core:4.4.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.guava:guava:27.0.1-android" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.zxing:core:2.3.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.knowm.xchange:xchange-bitfinex:4.4.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.knowm.xchange:xchange-itbit:4.4.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.knowm.xchange:xchange-bittrex:4.4.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.knowm.xchange:xchange-hitbtc:4.4.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.knowm.xchange:xchange-dvchain:4.4.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.knowm.xchange:xchange-coinbasepro:4.4.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.github.GENERALBYTESCOM:bitcoinj:0.15.1.20190411" level="project" />
+    <orderEntry type="library" name="Gradle: org.knowm.xchange:xchange-coingi:4.4.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.github.GENERALBYTESCOM:litecoinj:0.15.1.20190418" level="project" />
+    <orderEntry type="library" name="Gradle: org.knowm.xchange:xchange-enigma:4.4.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.github.GENERALBYTESCOM.dashj:dashj-core:0.15.2.20190416" level="project" />
+    <orderEntry type="library" name="Gradle: org.web3j:core:3.6.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.github.GENERALBYTESCOM.dashj:dashj-bls:0.15.2.20190416" level="project" />
+    <orderEntry type="library" name="Gradle: org.web3j:crypto:3.6.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.web3j:utils:3.6.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.web3j:abi:3.6.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.github.GENERALBYTESCOM.bitrafael_public:bitrafael-common:1.0.34" level="project" />
+    <orderEntry type="library" name="Gradle: com.squareup.okhttp3:okhttp:3.14.2" level="project" />
+    <orderEntry type="library" name="Gradle: io.reactivex:rxjava:1.2.4" level="project" />
+    <orderEntry type="library" name="Gradle: com.vdurmont:emoji-java:3.1.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.json:json:20180130" level="project" />
+    <orderEntry type="library" name="Gradle: com.squareup.okio:okio:1.17.2" level="project" />
+    <orderEntry type="library" name="Gradle: commons-codec:commons-codec:1.10" level="project" />
+    <orderEntry type="library" name="Gradle: org.bouncycastle:bcprov-jdk15on:1.61" level="project" />
+    <orderEntry type="library" name="Gradle: com.github.GENERALBYTESCOM.bitrafael_public:bitrafael-client:1.0.34" level="project" />
+    <orderEntry type="library" name="Gradle: junit:junit:4.10" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.web3j:rlp:3.6.0" level="project" />
+    <orderEntry type="library" name="Gradle: ch.qos.logback:logback-classic:1.2.3" level="project" />
+    <orderEntry type="library" name="Gradle: ch.qos.logback:logback-core:1.2.3" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.squareup.okhttp3:logging-interceptor:3.8.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.squareup.okhttp:okhttp:2.7.2" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: oauth.signpost:signpost-core:1.2.1.2" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.google.protobuf:protobuf-java:3.6.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.sun.mail:javax.mail:1.6.2" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.google.code.findbugs:jsr305:3.0.2" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: commons-io:commons-io:2.6" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.apache.commons:commons-lang3:3.9" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: javax.annotation:javax.annotation-api:1.3.2" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.google.guava:failureaccess:1.0.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.checkerframework:checker-compat-qual:2.5.2" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.google.errorprone:error_prone_annotations:2.2.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.google.j2objc:j2objc-annotations:1.3" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.codehaus.mojo:animal-sniffer-annotations:1.17" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.projectlombok:lombok:1.18.10" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.web3j:tuples:3.6.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.github.jnr:jnr-unixsocket:0.15" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.java-websocket:Java-WebSocket:1.3.8" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.madgag.spongycastle:core:1.52.0.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.hamcrest:hamcrest-core:1.3" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: javax.activation:activation:1.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.github.jnr:jnr-enxio:0.14" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.github.jnr:jnr-posix:3.0.33" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.github.jnr:jnr-ffi:2.1.2" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.github.jnr:jnr-constants:0.9.6" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.lambdaworks:scrypt:1.4.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: net.jcip:jcip-annotations:1.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.github.jnr:jffi:1.2.14" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.github.jnr:jffi:native:1.2.14" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.ow2.asm:asm-commons:5.0.3" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.ow2.asm:asm-analysis:5.0.3" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.ow2.asm:asm-util:5.0.3" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.ow2.asm:asm-tree:5.0.3" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.ow2.asm:asm:5.0.3" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.github.jnr:jnr-x86asm:1.0.2" level="project" />
+  </component>
+  <component name="TestModuleProperties" production-module="batm_public_enrique.server_extensions_extra.main" />
+</module>

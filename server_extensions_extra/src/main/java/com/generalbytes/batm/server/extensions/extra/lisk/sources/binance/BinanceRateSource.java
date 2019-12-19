@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2018 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -17,7 +17,8 @@
  ************************************************************************************/
 package com.generalbytes.batm.server.extensions.extra.lisk.sources.binance;
 
-import com.generalbytes.batm.server.extensions.Currencies;
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
+import com.generalbytes.batm.common.currencies.FiatCurrency;
 import com.generalbytes.batm.server.extensions.IRateSource;
 import com.generalbytes.batm.server.extensions.extra.dash.sources.coinmarketcap.CoinmarketcapRateSource;
 
@@ -30,37 +31,34 @@ public class BinanceRateSource implements IRateSource {
 
     private BinanceAPI api;
     private final String coinmarketcapApiKey;
-    private String preferredFiatCurrency = Currencies.USD;
+    private String preferredFiatCurrency = FiatCurrency.USD.getCode();
 
     public BinanceRateSource(String preferedFiatCurrency, String coinmarketcapApiKey) {
         this.coinmarketcapApiKey = coinmarketcapApiKey;
         api = RestProxyFactory.createProxy(BinanceAPI.class, "https://api.binance.com");
-        
-        if (Currencies.USD.equalsIgnoreCase(preferedFiatCurrency)) {
-            this.preferredFiatCurrency = Currencies.USD;
+
+        if (FiatCurrency.USD.getCode().equalsIgnoreCase(preferedFiatCurrency)) {
+            this.preferredFiatCurrency = FiatCurrency.USD.getCode();
         }
 
-        if (Currencies.HKD.equalsIgnoreCase(preferedFiatCurrency)) {
-            this.preferredFiatCurrency = Currencies.HKD;
+        if (FiatCurrency.HKD.getCode().equalsIgnoreCase(preferedFiatCurrency)) {
+            this.preferredFiatCurrency = FiatCurrency.HKD.getCode();
         }
     }
 
     @Override
     public Set<String> getCryptoCurrencies() {
-        Set<String> result = new HashSet<String>();
-        result.add(Currencies.BTC);
-        result.add(Currencies.LTC);
-        result.add(Currencies.ETH);
-        result.add(Currencies.LSK);
-
+        Set<String> result = new HashSet<>();
+        result.add(CryptoCurrency.LSK.getCode());
+        result.add(CryptoCurrency.NULS.getCode());
         return result;
     }
 
     @Override
     public Set<String> getFiatCurrencies() {
-        Set<String> result = new HashSet<String>();
-        result.add(Currencies.USD);
-        result.add(Currencies.HKD);
+        Set<String> result = new HashSet<>();
+        result.add(FiatCurrency.USD.getCode());
+        result.add(FiatCurrency.HKD.getCode());
         return result;
     }
 
@@ -75,15 +73,19 @@ public class BinanceRateSource implements IRateSource {
             return null;
         }
         final BinanceTickerData btcUsdt = api.getTicker("BTCUSDT");
-        final BinanceTickerData lskBtc = api.getTicker(cryptoCurrency + "BTC");
+        BigDecimal priceInBtc;
+        if ("BTC".equalsIgnoreCase(cryptoCurrency)) {
+            priceInBtc = BigDecimal.ONE;
+        } else {
+            BinanceTickerData selectedCryptoInBtc = api.getTicker(cryptoCurrency + "BTC");
+            priceInBtc = selectedCryptoInBtc.getPrice();
+        }
         CoinmarketcapRateSource coinMarketCapSource = new CoinmarketcapRateSource(coinmarketcapApiKey, fiatCurrency);
         BigDecimal lastUsdtFiat = coinMarketCapSource.getExchangeRateLast("USDT", fiatCurrency);
-        if (lastUsdtFiat != null && btcUsdt.getPrice()!=null && lskBtc.getPrice() !=null ) {
+        if (lastUsdtFiat != null && btcUsdt.getPrice() != null && priceInBtc != null ) {
             BigDecimal lastBtcPriceInUsdt = btcUsdt.getPrice();
-            BigDecimal lastLskPriceInBtc = lskBtc.getPrice();
-            BigDecimal lastLskPriceInUsdt = lastLskPriceInBtc.multiply(lastBtcPriceInUsdt);
-            BigDecimal lastLskPriceInFiat = lastLskPriceInUsdt.multiply(lastUsdtFiat);
-            return lastLskPriceInFiat;
+            BigDecimal lastSelectedCryptoPriceInUsdt = priceInBtc.multiply(lastBtcPriceInUsdt);
+            return lastSelectedCryptoPriceInUsdt.multiply(lastUsdtFiat);
         }
         return null;
     }

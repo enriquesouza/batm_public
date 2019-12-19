@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2016 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -17,51 +17,70 @@
  ************************************************************************************/
 package com.generalbytes.batm.server.extensions.extra.litecoin;
 
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
+import com.generalbytes.batm.common.currencies.FiatCurrency;
 import com.generalbytes.batm.server.extensions.*;
 import com.generalbytes.batm.server.extensions.FixPriceRateSource;
 import com.generalbytes.batm.server.extensions.extra.litecoin.wallets.litecoind.LitecoindRPCWallet;
+import com.generalbytes.batm.server.extensions.extra.litecoin.wallets.litecoind.LitecoindUniqueAddressRPCWallet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.net.InetSocketAddress;
 import java.util.*;
 
 public class LitecoinExtension extends AbstractExtension{
+    private static final Logger log = LoggerFactory.getLogger(LitecoinExtension.class);
+
     @Override
     public String getName() {
         return "BATM Litecoin extension";
     }
 
     @Override
-    public IWallet createWallet(String walletLogin) {
+    public IWallet createWallet(String walletLogin, String tunnelPassword) {
+        try {
         if (walletLogin !=null && !walletLogin.trim().isEmpty()) {
             StringTokenizer st = new StringTokenizer(walletLogin,":");
             String walletType = st.nextToken();
 
-            if ("litecoind".equalsIgnoreCase(walletType)) {
+            if ("litecoind".equalsIgnoreCase(walletType)
+                || "litecoindnoforward".equalsIgnoreCase(walletType)) {
                 //"litecoind:protocol:user:password:ip:port:accountname"
 
                 String protocol = st.nextToken();
                 String username = st.nextToken();
                 String password = st.nextToken();
                 String hostname = st.nextToken();
-                String port = st.nextToken();
-                String accountName ="";
+                int port = Integer.parseInt(st.nextToken());
+                String accountName = "";
                 if (st.hasMoreTokens()) {
                     accountName = st.nextToken();
                 }
 
+                InetSocketAddress tunnelAddress = ctx.getTunnelManager().connectIfNeeded(tunnelPassword, InetSocketAddress.createUnresolved(hostname, port));
+                hostname = tunnelAddress.getHostString();
+                port = tunnelAddress.getPort();
 
-                if (protocol != null && username != null && password != null && hostname !=null && port != null && accountName != null) {
+                if (protocol != null && username != null && password != null && hostname !=null && accountName != null) {
                     String rpcURL = protocol +"://" + username +":" + password + "@" + hostname +":" + port;
-                    return new LitecoindRPCWallet(rpcURL,accountName);
+                    if ("litecoindnoforward".equalsIgnoreCase(walletType)) {
+                        return new LitecoindUniqueAddressRPCWallet(rpcURL, accountName);
+                    }
+                    return new LitecoindRPCWallet(rpcURL, accountName);
                 }
             }
+        }
+        } catch (Exception e) {
+            log.error("", e);
         }
         return null;
     }
 
     @Override
     public ICryptoAddressValidator createAddressValidator(String cryptoCurrency) {
-        if (Currencies.LTC.equalsIgnoreCase(cryptoCurrency)) {
+        if (CryptoCurrency.LTC.getCode().equalsIgnoreCase(cryptoCurrency)) {
             return new LitecoinAddressValidator();
         }
         return null;
@@ -81,7 +100,7 @@ public class LitecoinExtension extends AbstractExtension{
                     } catch (Throwable e) {
                     }
                 }
-                String preferedFiatCurrency = Currencies.USD;
+                String preferedFiatCurrency = FiatCurrency.USD.getCode();
                 if (st.hasMoreTokens()) {
                     preferedFiatCurrency = st.nextToken().toUpperCase();
                 }
@@ -94,7 +113,7 @@ public class LitecoinExtension extends AbstractExtension{
     @Override
     public Set<String> getSupportedCryptoCurrencies() {
         Set<String> result = new HashSet<String>();
-        result.add(Currencies.LTC);
+        result.add(CryptoCurrency.LTC.getCode());
         return result;
     }
 }

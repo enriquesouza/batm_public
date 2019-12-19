@@ -1,6 +1,24 @@
+/*************************************************************************************
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
+ *
+ * This software may be distributed and modified under the terms of the GNU
+ * General Public License version 2 (GPL2) as published by the Free Software
+ * Foundation and appearing in the file GPL2.TXT included in the packaging of
+ * this file. Please note that GPL2 Section 2[b] requires that all works based
+ * on this software must also be made publicly available under the terms of
+ * the GPL2 ("Copyleft").
+ *
+ * Contact information
+ * -------------------
+ *
+ * GENERAL BYTES s.r.o.
+ * Web      :  http://www.generalbytes.com
+ *
+ ************************************************************************************/
 package com.generalbytes.batm.server.extensions.extra.futurocoin.sources.yobit;
 
-import com.generalbytes.batm.server.extensions.Currencies;
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
+import com.generalbytes.batm.common.currencies.FiatCurrency;
 import com.generalbytes.batm.server.extensions.IRateSourceAdvanced;
 
 import java.math.BigDecimal;
@@ -21,21 +39,21 @@ public class YobitRateSource implements IRateSourceAdvanced {
     @Override
     public Set<String> getCryptoCurrencies() {
         Set<String> result = new HashSet<String>();
-        result.add(Currencies.FTO);
-        result.add(Currencies.BTC);
-        result.add(Currencies.LTC);
-        result.add(Currencies.MAX);
-        result.add(Currencies.DASH);
-        result.add(Currencies.ETH);
-        result.add(Currencies.LSK);
-        result.add(Currencies.DOGE);
+        result.add(CryptoCurrency.FTO.getCode());
+        result.add(CryptoCurrency.BTC.getCode());
+        result.add(CryptoCurrency.LTC.getCode());
+        result.add(CryptoCurrency.MAX.getCode());
+        result.add(CryptoCurrency.DASH.getCode());
+        result.add(CryptoCurrency.ETH.getCode());
+        result.add(CryptoCurrency.LSK.getCode());
+        result.add(CryptoCurrency.DOGE.getCode());
         return result;
     }
 
     @Override
     public Set<String> getFiatCurrencies() {
         Set<String> result = new HashSet<String>();
-        result.add(Currencies.USD);
+        result.add(FiatCurrency.USD.getCode());
         return result;
     }
 
@@ -56,7 +74,7 @@ public class YobitRateSource implements IRateSourceAdvanced {
 
     @Override
     public String getPreferredFiatCurrency() {
-        return Currencies.USD;
+        return FiatCurrency.USD.getCode();
     }
 
     @Override

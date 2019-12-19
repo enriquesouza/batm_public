@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2018 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -16,6 +16,9 @@
  *
  ************************************************************************************/
 package com.generalbytes.batm.server.extensions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is used for publishing REST services on BATM CAS Server
@@ -34,4 +37,13 @@ public interface IRestService {
      * @return
      */
     Class getImplementation();
+
+    /**
+     * Returns list of filters used in this rest service.
+     * Filter class has to implement javax.servlet.Filter interface.
+     * @return
+     */
+    default List<Class> getFilters() {
+        return new ArrayList<>(0);
+    }
 }

@@ -15,13 +15,8 @@
 
 package com.generalbytes.batm.server.extensions.extra.smartcash.sources.smartcash;
 
-import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
-import com.generalbytes.batm.server.extensions.Currencies;
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
+import com.generalbytes.batm.common.currencies.FiatCurrency;
 import com.generalbytes.batm.server.extensions.IRateSource;
 
 import org.slf4j.Logger;
@@ -29,20 +24,26 @@ import org.slf4j.LoggerFactory;
 
 import si.mazi.rescu.RestProxyFactory;
 
-public class SmartCashRateSource implements IRateSource {
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import java.lang.reflect.Field;
+
+public class SmartCashRateSource implements IRateSource{
     private static final Logger log = LoggerFactory.getLogger(SmartCashRateSource.class);
 
     private String preferedFiatCurrency;
     private ISmartCashAPI api;
 
-    private static HashMap<String, BigDecimal> rateAmounts = new HashMap<String, BigDecimal>();
-    private static HashMap<String, Long> rateTimes = new HashMap<String, Long>();
-    private static final long MAXIMUM_ALLOWED_TIME_OFFSET = 30 * 1000; // 30sec
+    private static HashMap<String,BigDecimal> rateAmounts = new HashMap<String, BigDecimal>();
+    private static HashMap<String,Long> rateTimes = new HashMap<String, Long>();
+    private static final long MAXIMUM_ALLOWED_TIME_OFFSET = 30 * 1000; //30sec
 
     public SmartCashRateSource(String preferedFiatCurrency) {
 
         if (!getFiatCurrencies().contains(preferedFiatCurrency)) {
-            preferedFiatCurrency = Currencies.USD;
+            preferedFiatCurrency = FiatCurrency.USD.getCode();
         }
 
         this.preferedFiatCurrency = preferedFiatCurrency;
@@ -71,33 +72,33 @@ public class SmartCashRateSource implements IRateSource {
     @Override
     public Set<String> getCryptoCurrencies() {
         Set<String> result = new HashSet<String>();
-        result.add(Currencies.SMART);
+        result.add(CryptoCurrency.SMART.getCode());
         return result;
     }
 
     @Override
     public BigDecimal getExchangeRateLast(String cryptoCurrency, String fiatCurrency) {
 
-        String key = cryptoCurrency + "_" + fiatCurrency;
+        String key = cryptoCurrency +"_" + fiatCurrency;
         synchronized (rateAmounts) {
-            long now = System.currentTimeMillis();
+            long now  = System.currentTimeMillis();
             BigDecimal amount = rateAmounts.get(key);
             if (amount == null) {
                 BigDecimal result = getExchangeRateLastSync(cryptoCurrency, fiatCurrency);
                 log.debug("Called smartcash exchange for rate: " + key + " = " + result);
-                rateAmounts.put(key, result);
-                rateTimes.put(key, now + MAXIMUM_ALLOWED_TIME_OFFSET);
+                rateAmounts.put(key,result);
+                rateTimes.put(key,now+MAXIMUM_ALLOWED_TIME_OFFSET);
                 return result;
-            } else {
+            }else {
                 Long expirationTime = rateTimes.get(key);
                 if (expirationTime > now) {
                     return rateAmounts.get(key);
-                } else {
-                    // do the job;
+                }else{
+                    //do the job;
                     BigDecimal result = getExchangeRateLastSync(cryptoCurrency, fiatCurrency);
                     log.debug("Called smartcash exchange for rate: " + key + " = " + result);
-                    rateAmounts.put(key, result);
-                    rateTimes.put(key, now + MAXIMUM_ALLOWED_TIME_OFFSET);
+                    rateAmounts.put(key,result);
+                    rateTimes.put(key,now+MAXIMUM_ALLOWED_TIME_OFFSET);
                     return result;
                 }
             }
@@ -106,8 +107,8 @@ public class SmartCashRateSource implements IRateSource {
     }
 
     private BigDecimal getExchangeRateLastSync(String cryptoCurrency, String fiatCurrency) {
-        if (!Currencies.SMART.equalsIgnoreCase(cryptoCurrency)) {
-            return null; // unsupported currency
+        if (!CryptoCurrency.SMART.getCode().equalsIgnoreCase(cryptoCurrency)) {
+            return null; //unsupported currency
         }
         APIResponse response = api.returnResponse();
 

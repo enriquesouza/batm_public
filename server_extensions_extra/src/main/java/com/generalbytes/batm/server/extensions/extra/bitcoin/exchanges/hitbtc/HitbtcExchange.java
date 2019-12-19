@@ -1,17 +1,38 @@
+/*************************************************************************************
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
+ *
+ * This software may be distributed and modified under the terms of the GNU
+ * General Public License version 2 (GPL2) as published by the Free Software
+ * Foundation and appearing in the file GPL2.TXT included in the packaging of
+ * this file. Please note that GPL2 Section 2[b] requires that all works based
+ * on this software must also be made publicly available under the terms of
+ * the GPL2 ("Copyleft").
+ *
+ * Contact information
+ * -------------------
+ *
+ * GENERAL BYTES s.r.o.
+ * Web      :  http://www.generalbytes.com
+ *
+ ************************************************************************************/
 package com.generalbytes.batm.server.extensions.extra.bitcoin.exchanges.hitbtc;
 
-import com.generalbytes.batm.server.extensions.Currencies;
-import com.generalbytes.batm.server.extensions.Currencies;
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
+import com.generalbytes.batm.common.currencies.FiatCurrency;
 import com.generalbytes.batm.server.extensions.extra.bitcoin.exchanges.XChangeExchange;
 import org.knowm.xchange.ExchangeSpecification;
+import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.dto.account.AccountInfo;
 import org.knowm.xchange.dto.account.Wallet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
 public class HitbtcExchange extends XChangeExchange {
+    private static final Logger log = LoggerFactory.getLogger("batm.master.exchange.HitbtcExchange");
 
     public HitbtcExchange(String preferredFiatCurrency) {
         super(getDefaultSpecification(), preferredFiatCurrency);
@@ -36,22 +57,22 @@ public class HitbtcExchange extends XChangeExchange {
     @Override
     public Set<String> getCryptoCurrencies() {
         Set<String> cryptoCurrencies = new HashSet<>();
-        cryptoCurrencies.add(Currencies.BTC);
-        cryptoCurrencies.add(Currencies.ETH);
-        cryptoCurrencies.add(Currencies.LTC);
-        cryptoCurrencies.add(Currencies.SMART);
-        cryptoCurrencies.add(Currencies.BCH);
-        cryptoCurrencies.add(Currencies.DOGE);
-        cryptoCurrencies.add(Currencies.XMR);
-        cryptoCurrencies.add(Currencies.DASH);
-        cryptoCurrencies.add(Currencies.NXT);
+        cryptoCurrencies.add(CryptoCurrency.BTC.getCode());
+        cryptoCurrencies.add(CryptoCurrency.ETH.getCode());
+        cryptoCurrencies.add(CryptoCurrency.LTC.getCode());
+        cryptoCurrencies.add(CryptoCurrency.SMART.getCode());
+        cryptoCurrencies.add(CryptoCurrency.BCH.getCode());
+        cryptoCurrencies.add(CryptoCurrency.DOGE.getCode());
+        cryptoCurrencies.add(CryptoCurrency.XMR.getCode());
+        cryptoCurrencies.add(CryptoCurrency.DASH.getCode());
+        cryptoCurrencies.add(CryptoCurrency.NXT.getCode());
         return cryptoCurrencies;
     }
 
     @Override
     public Set<String> getFiatCurrencies() {
         Set<String> fiatCurrencies = new HashSet<>();
-        fiatCurrencies.add(Currencies.USD);
+        fiatCurrencies.add(FiatCurrency.USD.getCode());
         return fiatCurrencies;
     }
 
@@ -66,8 +87,15 @@ public class HitbtcExchange extends XChangeExchange {
     }
 
     @Override
-    public Wallet getWallet(AccountInfo accountInfo, String fiatCurrency) {
-        return accountInfo.getWallet(null); // HitBTC creates only one wallet with key=null
+    public Wallet getWallet(AccountInfo accountInfo, String currency) {
+        Wallet trading = accountInfo.getWallet("Trading");
+        if (log.isDebugEnabled()) {
+            Wallet main = accountInfo.getWallet("Main");
+            BigDecimal tradingAvailable = trading.getBalance(Currency.getInstance(currency)).getAvailable();
+            BigDecimal mainAvailable = main.getBalance(Currency.getInstance(currency)).getAvailable();
+            log.debug("HitBtc wallets available {} balances: trading: {}, main: {}", currency, tradingAvailable, mainAvailable);
+        }
+        return trading;
     }
 
 //    public static void main(String[] args) {

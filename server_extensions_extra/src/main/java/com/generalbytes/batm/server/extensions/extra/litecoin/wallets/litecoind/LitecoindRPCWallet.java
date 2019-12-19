@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2016 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -19,8 +19,7 @@ package com.generalbytes.batm.server.extensions.extra.litecoin.wallets.litecoind
 
 import wf.bitcoin.javabitcoindrpcclient.BitcoinRPCException;
 import wf.bitcoin.javabitcoindrpcclient.BitcoinJSONRPCClient;
-import com.generalbytes.batm.server.extensions.Currencies;
-import com.generalbytes.batm.server.extensions.Currencies;
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
 import com.generalbytes.batm.server.extensions.IWallet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,7 @@ import java.util.Set;
 
 public class LitecoindRPCWallet implements IWallet{
     private static final Logger log = LoggerFactory.getLogger(LitecoindRPCWallet.class);
-    private static final String CRYPTO_CURRENCY = Currencies.LTC;
+    private static final String CRYPTO_CURRENCY = CryptoCurrency.LTC.getCode();
 
     public LitecoindRPCWallet(String rpcURL, String accountName) {
         this.rpcURL = rpcURL;
@@ -88,6 +87,20 @@ public class LitecoindRPCWallet implements IWallet{
             }else{
                 return addressesByAccount.get(0);
             }
+        } catch (BitcoinRPCException e) {
+            log.error("Error", e);
+            return null;
+        }
+    }
+
+    public String generateNewDepositCryptoAddress(String cryptoCurrency, String label) {
+        if (!CRYPTO_CURRENCY.equalsIgnoreCase(cryptoCurrency)) {
+            log.error("Litecoind wallet error: unknown cryptocurrency.");
+            return null;
+        }
+
+        try {
+            return getClient(rpcURL).getNewAddress(accountName);
         } catch (BitcoinRPCException e) {
             log.error("Error", e);
             return null;

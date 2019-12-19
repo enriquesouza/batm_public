@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.knowm.xchange:xchange-dvchain:4.4.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.knowm.xchange/xchange-dvchain/4.4.0/d612a5f6f01bc074468142c1a245b27942bad9f3/xchange-dvchain-4.4.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.knowm.xchange/xchange-dvchain/4.4.0/59d0ce0e7a2bb3030a105376b98795346917f4a9/xchange-dvchain-4.4.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

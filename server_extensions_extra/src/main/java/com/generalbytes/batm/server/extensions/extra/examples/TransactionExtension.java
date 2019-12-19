@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2018 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -37,6 +37,16 @@ public class TransactionExtension extends AbstractExtension implements ITransact
     public void init(IExtensionContext ctx) {
         super.init(ctx);
         ctx.addTransactionListener(this);
+    }
+
+    @Override
+    public boolean isTransactionApproved(ITransactionRequest transactionRequest) {
+        return true; //approve all transactions
+    }
+
+    @Override
+    public boolean isTransactionPreparationApproved(ITransactionPreparation preparation) {
+        return true; //approve all transactions
     }
 
     @Override

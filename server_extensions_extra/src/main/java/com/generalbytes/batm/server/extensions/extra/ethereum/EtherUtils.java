@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2018 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -20,7 +20,7 @@ package com.generalbytes.batm.server.extensions.extra.ethereum;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.generalbytes.batm.server.extensions.Currencies;
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
 import com.generalbytes.bitrafael.api.wallet.IWalletTools;
 import com.generalbytes.bitrafael.api.wallet.eth.MasterPrivateKeyETH;
 import com.generalbytes.bitrafael.api.wallet.eth.WalletToolsETH;
@@ -68,8 +68,8 @@ public class EtherUtils {
 
     public static Credentials loadBip44Credentials(String mnemonic, String password) {
         WalletToolsETH wt = new WalletToolsETH();
-        MasterPrivateKeyETH m = wt.getMasterPrivateKey(mnemonic, password, Currencies.ETH, IWalletTools.STANDARD_BIP44);
-        String walletPrivateKey = wt.getWalletPrivateKey(m, Currencies.ETH, 0, 0, 0);
+        MasterPrivateKeyETH m = wt.getMasterPrivateKey(mnemonic, password, CryptoCurrency.ETH.getCode(), IWalletTools.STANDARD_BIP44);
+        String walletPrivateKey = wt.getWalletPrivateKey(m, CryptoCurrency.ETH.getCode(), 0, 0, 0);
         return Credentials.create(walletPrivateKey);
     }
 

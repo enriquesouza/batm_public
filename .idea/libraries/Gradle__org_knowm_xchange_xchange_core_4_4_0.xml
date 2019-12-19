@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.knowm.xchange:xchange-core:4.4.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.knowm.xchange/xchange-core/4.4.0/d47b71dd86a5f4d653ce7d6849bbe93df2ceac2/xchange-core-4.4.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.knowm.xchange/xchange-core/4.4.0/788d0f5a67039199b253ebf631b7b1b95ffcf2c0/xchange-core-4.4.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,6 +1,24 @@
+/*************************************************************************************
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
+ *
+ * This software may be distributed and modified under the terms of the GNU
+ * General Public License version 2 (GPL2) as published by the Free Software
+ * Foundation and appearing in the file GPL2.TXT included in the packaging of
+ * this file. Please note that GPL2 Section 2[b] requires that all works based
+ * on this software must also be made publicly available under the terms of
+ * the GPL2 ("Copyleft").
+ *
+ * Contact information
+ * -------------------
+ *
+ * GENERAL BYTES s.r.o.
+ * Web      :  http://www.generalbytes.com
+ *
+ ************************************************************************************/
 package com.generalbytes.batm.server.extensions.extra.digibyte.sources.livecoin;
 
-import com.generalbytes.batm.server.extensions.Currencies;
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
+import com.generalbytes.batm.common.currencies.FiatCurrency;
 import com.generalbytes.batm.server.extensions.IRateSource;
 
 import java.math.BigDecimal;
@@ -13,14 +31,14 @@ public class LiveCoinRateSource implements IRateSource {
 
   private ILiveCoinAPI api;
 
-  private String preferredFiatCurrency = Currencies.USD;
+  private String preferredFiatCurrency = FiatCurrency.USD.getCode();
 
   public LiveCoinRateSource(String preferedFiatCurrency) {
-    if (Currencies.EUR.equalsIgnoreCase(preferedFiatCurrency)) {
-      this.preferredFiatCurrency = Currencies.EUR;
+    if (FiatCurrency.EUR.getCode().equalsIgnoreCase(preferedFiatCurrency)) {
+      this.preferredFiatCurrency = FiatCurrency.EUR.getCode();
     }
-    if (Currencies.USD.equalsIgnoreCase(preferedFiatCurrency)) {
-      this.preferredFiatCurrency = Currencies.USD;
+    if (FiatCurrency.USD.getCode().equalsIgnoreCase(preferedFiatCurrency)) {
+      this.preferredFiatCurrency = FiatCurrency.USD.getCode();
     }
     api = RestProxyFactory.createProxy(ILiveCoinAPI.class, "https://api.livecoin.net");
   }
@@ -29,15 +47,15 @@ public class LiveCoinRateSource implements IRateSource {
   @Override
   public Set<String> getCryptoCurrencies() {
     Set<String> result = new HashSet<String>();
-    result.add(Currencies.DGB);
+    result.add(CryptoCurrency.DGB.getCode());
     return result;
   }
 
   @Override
   public Set<String> getFiatCurrencies() {
     Set<String> result = new HashSet<String>();
-    result.add(Currencies.USD);
-    result.add(Currencies.EUR);
+    result.add(FiatCurrency.USD.getCode());
+    result.add(FiatCurrency.EUR.getCode());
     return result;
   }
 
@@ -47,10 +65,10 @@ public class LiveCoinRateSource implements IRateSource {
       return null;
     }
     //Grab the last dgb rate in btc
-    LiveCoinTicker dgbBtc = api.getTicker(Currencies.DGB + "/" + Currencies.BTC);
+    LiveCoinTicker dgbBtc = api.getTicker(CryptoCurrency.DGB.getCode() + "/" + CryptoCurrency.BTC.getCode());
 
     //Grab the last btc rate in the selected fiat currency
-    LiveCoinTicker btcFiat = api.getTicker(Currencies.BTC + "/" + fiatCurrency);
+    LiveCoinTicker btcFiat = api.getTicker(CryptoCurrency.BTC.getCode() + "/" + fiatCurrency);
 
     BigDecimal lastDgbPriceInBtc = dgbBtc.getLast();
     BigDecimal lastBtcPriceInFiat = btcFiat.getLast();

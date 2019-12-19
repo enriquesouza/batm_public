@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2018 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -17,7 +17,7 @@
  ************************************************************************************/
 package com.generalbytes.batm.server.extensions.extra.sumcoin;
 
-import com.generalbytes.batm.server.extensions.Currencies;
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
 import com.generalbytes.batm.server.extensions.ICryptoAddressValidator;
 import com.generalbytes.batm.server.extensions.extra.common.AbstractRPCPaymentSupport;
 import com.generalbytes.batm.server.extensions.extra.common.RPCClient;
@@ -27,9 +27,12 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.concurrent.TimeUnit;
 
-import wf.bitcoin.javabitcoindrpcclient.BitcoinRPCException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SumcoinPaymentSupport extends AbstractRPCPaymentSupport {
+    private static final Logger log = LoggerFactory.getLogger(SumcoinPaymentSupport.class);
+
     private SumcoinAddressValidator addressValidator = new SumcoinAddressValidator();
 
     private static final long MAXIMUM_WAIT_FOR_POSSIBLE_REFUND_MILLIS = TimeUnit.DAYS.toMillis(3); // 3 days
@@ -38,7 +41,7 @@ public class SumcoinPaymentSupport extends AbstractRPCPaymentSupport {
 
     @Override
     public String getCurrency() {
-        return Currencies.SUM;
+        return CryptoCurrency.SUM.getCode();
     }
 
     @Override
@@ -81,10 +84,10 @@ public class SumcoinPaymentSupport extends AbstractRPCPaymentSupport {
                 return getMinimumNetworkFee(client);
             }
             return estimate.divide(new BigDecimal("1000"), RoundingMode.UP).multiply(new BigDecimal(transactionSize));
-        } catch (BitcoinRPCException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.error("", e);
+            return getMinimumNetworkFee(client);
         }
-        return null;
     }
 
     @Override

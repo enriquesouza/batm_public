@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2016 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -17,6 +17,8 @@
  ************************************************************************************/
 package com.generalbytes.batm.server.extensions.extra.worldcoin;
 
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
+import com.generalbytes.batm.common.currencies.FiatCurrency;
 import com.generalbytes.batm.server.extensions.*;
 import com.generalbytes.batm.server.extensions.FixPriceRateSource;
 import com.generalbytes.batm.server.extensions.extra.worldcoin.sources.cd.CryptodiggersRateSource;
@@ -32,7 +34,7 @@ public class WorldcoinExtension extends AbstractExtension{
     }
 
     @Override
-    public IWallet createWallet(String walletLogin) {
+    public IWallet createWallet(String walletLogin, String tunnelPassword) {
         if (walletLogin !=null && !walletLogin.trim().isEmpty()) {
             StringTokenizer st = new StringTokenizer(walletLogin,":");
             String walletType = st.nextToken();
@@ -65,7 +67,7 @@ public class WorldcoinExtension extends AbstractExtension{
                 }
 
                 if (fiatCurrency != null && walletAddress != null) {
-                    return new DummyExchangeAndWalletAndSource(fiatCurrency, Currencies.WDC, walletAddress);
+                    return new DummyExchangeAndWalletAndSource(fiatCurrency, CryptoCurrency.WDC.getCode(), walletAddress);
                 }
             }
 
@@ -75,7 +77,7 @@ public class WorldcoinExtension extends AbstractExtension{
 
     @Override
     public ICryptoAddressValidator createAddressValidator(String cryptoCurrency) {
-        if (Currencies.WDC.equalsIgnoreCase(cryptoCurrency)) {
+        if (CryptoCurrency.WDC.getCode().equalsIgnoreCase(cryptoCurrency)) {
             return new WorldcoinAddressValidator();
         }
         return null;
@@ -90,7 +92,7 @@ public class WorldcoinExtension extends AbstractExtension{
                 if (st.hasMoreTokens()) {
                     return new CryptodiggersRateSource(st.nextToken());
                 }
-                return new CryptodiggersRateSource(Currencies.USD);
+                return new CryptodiggersRateSource(FiatCurrency.USD.getCode());
 	    }
             else if ("wdcfix".equalsIgnoreCase(exchangeType)) {
                 BigDecimal rate = BigDecimal.ZERO;
@@ -100,7 +102,7 @@ public class WorldcoinExtension extends AbstractExtension{
                     } catch (Throwable e) {
                     }
                 }
-                String preferedFiatCurrency = Currencies.USD;
+                String preferedFiatCurrency = FiatCurrency.USD.getCode();
                 if (st.hasMoreTokens()) {
                     preferedFiatCurrency = st.nextToken().toUpperCase();
                 }
@@ -113,7 +115,7 @@ public class WorldcoinExtension extends AbstractExtension{
     @Override
     public Set<String> getSupportedCryptoCurrencies() {
         Set<String> result = new HashSet<String>();
-        result.add(Currencies.WDC);
+        result.add(CryptoCurrency.WDC.getCode());
         return result;
     }
 }

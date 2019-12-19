@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2016 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -17,10 +17,12 @@
  ************************************************************************************/
 package com.generalbytes.batm.server.extensions.extra.dogecoin;
 
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
+import com.generalbytes.batm.common.currencies.FiatCurrency;
 import com.generalbytes.batm.server.extensions.*;
 import com.generalbytes.batm.server.extensions.FixPriceRateSource;
-import com.generalbytes.batm.server.extensions.extra.dogecoin.sources.chainso.ChainSoRateSource;
-import com.generalbytes.batm.server.extensions.extra.dogecoin.wallets.blockio.BlockIOWallet;
+import com.generalbytes.batm.server.extensions.extra.dogecoin.wallets.blockio.BlockIOWalletWithClientSideSigning;
+import com.generalbytes.batm.server.extensions.extra.dogecoin.wallets.blockio.BlockIOWalletWithClientSideSigningWithUniqueAddresses;
 import com.generalbytes.batm.server.extensions.extra.dogecoin.wallets.dogecoind.DogecoindRPCWallet;
 
 import java.math.BigDecimal;
@@ -34,7 +36,7 @@ public class DogecoinExtension extends AbstractExtension{
     }
 
     @Override
-    public IWallet createWallet(String walletLogin) {
+    public IWallet createWallet(String walletLogin, String tunnelPassword) {
         if (walletLogin !=null && !walletLogin.trim().isEmpty()) {
             StringTokenizer st = new StringTokenizer(walletLogin,":");
             String walletType = st.nextToken();
@@ -46,9 +48,18 @@ public class DogecoinExtension extends AbstractExtension{
                 if (st.hasMoreTokens()) {
                     priority = st.nextToken();
                 }
-                return new BlockIOWallet(apikey,pin, priority);
+                return new BlockIOWalletWithClientSideSigning(apikey, pin, priority);
 
-            }else if ("dogecoind".equalsIgnoreCase(walletType)) {
+            } else if ("blockionoforward".equalsIgnoreCase(walletType)) {
+                String apikey = st.nextToken();
+                String pin = st.nextToken();
+                String priority = null;
+                if (st.hasMoreTokens()) {
+                    priority = st.nextToken();
+                }
+                return new BlockIOWalletWithClientSideSigningWithUniqueAddresses(apikey,pin, priority);
+
+            } else if ("dogecoind".equalsIgnoreCase(walletType)) {
                 //"dogecoind:protocol:user:password:ip:port:accountname"
 
                 String protocol = st.nextToken();
@@ -76,7 +87,7 @@ public class DogecoinExtension extends AbstractExtension{
                 }
 
                 if (fiatCurrency != null && walletAddress != null) {
-                    return new DummyExchangeAndWalletAndSource(fiatCurrency, Currencies.DOGE, walletAddress);
+                    return new DummyExchangeAndWalletAndSource(fiatCurrency, CryptoCurrency.DOGE.getCode(), walletAddress);
                 }
             }
 
@@ -86,7 +97,7 @@ public class DogecoinExtension extends AbstractExtension{
 
     @Override
     public ICryptoAddressValidator createAddressValidator(String cryptoCurrency) {
-        if (Currencies.DOGE.equalsIgnoreCase(cryptoCurrency)) {
+        if (CryptoCurrency.DOGE.getCode().equalsIgnoreCase(cryptoCurrency)) {
             return new DogecoinAddressValidator();
         }
         return null;
@@ -98,9 +109,7 @@ public class DogecoinExtension extends AbstractExtension{
             StringTokenizer st = new StringTokenizer(sourceLogin,":");
             String exchangeType = st.nextToken();
 
-            if ("chainso".equalsIgnoreCase(exchangeType)) {
-                return new ChainSoRateSource();
-            }else if ("dogefix".equalsIgnoreCase(exchangeType)) {
+            if ("dogefix".equalsIgnoreCase(exchangeType)) {
                 BigDecimal rate = BigDecimal.ZERO;
                 if (st.hasMoreTokens()) {
                     try {
@@ -108,7 +117,7 @@ public class DogecoinExtension extends AbstractExtension{
                     } catch (Throwable e) {
                     }
                 }
-                String preferedFiatCurrency = Currencies.USD;
+                String preferedFiatCurrency = FiatCurrency.USD.getCode();
                 if (st.hasMoreTokens()) {
                     preferedFiatCurrency = st.nextToken().toUpperCase();
                 }
@@ -121,7 +130,7 @@ public class DogecoinExtension extends AbstractExtension{
     @Override
     public Set<String> getSupportedCryptoCurrencies() {
         Set<String> result = new HashSet<String>();
-        result.add(Currencies.DOGE);
+        result.add(CryptoCurrency.DOGE.getCode());
         return result;
     }
 

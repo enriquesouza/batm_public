@@ -1,14 +1,33 @@
+/*************************************************************************************
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
+ *
+ * This software may be distributed and modified under the terms of the GNU
+ * General Public License version 2 (GPL2) as published by the Free Software
+ * Foundation and appearing in the file GPL2.TXT included in the packaging of
+ * this file. Please note that GPL2 Section 2[b] requires that all works based
+ * on this software must also be made publicly available under the terms of
+ * the GPL2 ("Copyleft").
+ *
+ * Contact information
+ * -------------------
+ *
+ * GENERAL BYTES s.r.o.
+ * Web      :  http://www.generalbytes.com
+ *
+ ************************************************************************************/
+
 package com.generalbytes.batm.server.extensions.extra.dogecoin.wallets.blockio;
 
-import com.generalbytes.batm.server.extensions.Currencies;
-import com.generalbytes.batm.server.extensions.Currencies;
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
 import com.generalbytes.batm.server.extensions.IWallet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import si.mazi.rescu.ClientConfig;
 import si.mazi.rescu.RestProxyFactory;
 
+import javax.ws.rs.QueryParam;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -17,18 +36,17 @@ import static com.generalbytes.batm.server.extensions.extra.dogecoin.wallets.blo
 import static com.generalbytes.batm.server.extensions.extra.dogecoin.wallets.blockio.IBlockIO.PRIORITY_MEDIUM;
 
 /**
- * Created by b00lean on 8/11/14.
+ * @deprecated Use {@link BlockIOWalletWithClientSideSigning}
  */
+@Deprecated
 public class BlockIOWallet implements IWallet {
     private static final Logger log = LoggerFactory.getLogger("batm.master.extensions.BlockIOWallet");
-    private String apiKey;
     private String pin;
     private String priority;
 
     private IBlockIO api;
 
     public BlockIOWallet(String apiKey, String pin, String priority) {
-        this.apiKey = apiKey;
         this.pin = pin;
         if (priority == null) {
             this.priority = PRIORITY_LOW;
@@ -43,21 +61,23 @@ public class BlockIOWallet implements IWallet {
         } else {
             this.priority = PRIORITY_LOW;
         }
-        api = RestProxyFactory.createProxy(IBlockIO.class, "https://block.io");
+        ClientConfig config = new ClientConfig();
+        config.addDefaultParam(QueryParam.class, "api_key", apiKey);
+        api = RestProxyFactory.createProxy(IBlockIO.class, "https://block.io", config);
     }
 
     @Override
     public Set<String> getCryptoCurrencies() {
         Set<String> result = new HashSet<String>();
-        result.add(Currencies.BTC);
-        result.add(Currencies.LTC);
-        result.add(Currencies.DOGE);
+        result.add(CryptoCurrency.BTC.getCode());
+        result.add(CryptoCurrency.LTC.getCode());
+        result.add(CryptoCurrency.DOGE.getCode());
         return result;
     }
 
     @Override
     public String getPreferredCryptoCurrency() {
-        return Currencies.BTC;
+        return CryptoCurrency.BTC.getCode();
     }
 
     @Override
@@ -66,7 +86,7 @@ public class BlockIOWallet implements IWallet {
             return null;
         }
         try {
-            BlockIOResponseAddresses response = api.getAddresses(apiKey);
+            BlockIOResponseAddresses response = api.getAddresses();
             if (response != null && response.getData() != null && response.getData().getAddresses() != null && response.getData().getAddresses().length> 0) {
                 return response.getData().getAddresses()[0].getAddress();
             }
@@ -84,7 +104,7 @@ public class BlockIOWallet implements IWallet {
             return null;
         }
         try {
-            BlockIOResponseBalance response = api.getBalance(apiKey);
+            BlockIOResponseBalance response = api.getBalance();
             if (response != null && response.getData() != null && response.getData().getAvailable_balance() != null ) {
                 return new BigDecimal(response.getData().getAvailable_balance());
             }
@@ -101,7 +121,7 @@ public class BlockIOWallet implements IWallet {
             return null;
         }
         try {
-            BlockIOResponseWithdrawal response = api.withdraw(apiKey, pin, amount.toPlainString(), destinationAddress, priority);
+            BlockIOResponseWithdrawal response = api.withdraw(pin, amount.toPlainString(), destinationAddress, priority);
             if (response != null && response.getStatus() != null && "success".equalsIgnoreCase(response.getStatus()) && response.getData() != null && response.getData().getTxid() !=null) {
                 return response.getData().getTxid();
             }
@@ -111,5 +131,15 @@ public class BlockIOWallet implements IWallet {
 
         return null;
     }
+
+//    public static void main(String[] args) {
+//        final BlockIOWallet blockIOWallet = new BlockIOWallet("xxxx", "xxxx", "medium");
+//        final BigDecimal ltc = blockIOWallet.getCryptoBalance("LTC");
+//        System.out.println("ltc = " + ltc);
+//        String address = blockIOWallet.getCryptoAddress("LTC");
+//        System.out.println("address = " + address);
+//        String s = blockIOWallet.sendCoins("LSYi8VQjbR3LAAdqkd4jSzj3Ci5B9Pryvk", new BigDecimal("0.01"), "LTC", "blabla");
+//        System.out.println("s = " + s);
+//    }
 
 }

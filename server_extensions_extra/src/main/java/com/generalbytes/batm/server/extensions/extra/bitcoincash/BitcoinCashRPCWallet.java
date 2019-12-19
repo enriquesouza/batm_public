@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2018 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -17,13 +17,13 @@
  ************************************************************************************/
 package com.generalbytes.batm.server.extensions.extra.bitcoincash;
 
-import com.generalbytes.batm.server.extensions.Currencies;
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
 import com.generalbytes.batm.server.extensions.extra.common.RPCWallet;
 
 //You need to have node running: i.e.:  bitcoind -rpcuser=rpcuser -rpcpassword=rpcpassword -rpcport=8332
 
 public class BitcoinCashRPCWallet extends RPCWallet {
     public BitcoinCashRPCWallet(String rpcURL, String accountName) {
-        super(rpcURL, accountName, Currencies.BCH);
+        super(rpcURL, accountName, CryptoCurrency.BCH.getCode());
     }
 }

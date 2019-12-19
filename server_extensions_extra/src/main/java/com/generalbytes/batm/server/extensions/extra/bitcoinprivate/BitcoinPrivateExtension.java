@@ -1,5 +1,24 @@
+/*************************************************************************************
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
+ *
+ * This software may be distributed and modified under the terms of the GNU
+ * General Public License version 2 (GPL2) as published by the Free Software
+ * Foundation and appearing in the file GPL2.TXT included in the packaging of
+ * this file. Please note that GPL2 Section 2[b] requires that all works based
+ * on this software must also be made publicly available under the terms of
+ * the GPL2 ("Copyleft").
+ *
+ * Contact information
+ * -------------------
+ *
+ * GENERAL BYTES s.r.o.
+ * Web      :  http://www.generalbytes.com
+ *
+ ************************************************************************************/
 package com.generalbytes.batm.server.extensions.extra.bitcoinprivate;
 
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
+import com.generalbytes.batm.common.currencies.FiatCurrency;
 import com.generalbytes.batm.server.extensions.*;
 import com.generalbytes.batm.server.extensions.FixPriceRateSource;
 import com.generalbytes.batm.server.extensions.extra.bitcoinprivate.wallets.btcpd.BitcoinPrivateRPCWallet;
@@ -21,7 +40,7 @@ public class BitcoinPrivateExtension extends AbstractExtension {
     }
 
     @Override
-    public IWallet createWallet(String walletLogin) {
+    public IWallet createWallet(String walletLogin, String tunnelPassword) {
         if (walletLogin != null && !walletLogin.trim().isEmpty()) {
             StringTokenizer st = new StringTokenizer(walletLogin, ":");
             String walletType = st.nextToken();
@@ -52,7 +71,7 @@ public class BitcoinPrivateExtension extends AbstractExtension {
                 }
 
                 if (fiatCurrency != null && walletAddress != null) {
-                    return new DummyExchangeAndWalletAndSource(fiatCurrency, Currencies.BTCP, walletAddress);
+                    return new DummyExchangeAndWalletAndSource(fiatCurrency, CryptoCurrency.BTCP.getCode(), walletAddress);
                 }
             }
 
@@ -62,7 +81,7 @@ public class BitcoinPrivateExtension extends AbstractExtension {
 
     @Override
     public ICryptoAddressValidator createAddressValidator(String cryptoCurrency) {
-        if (Currencies.BTCP.equalsIgnoreCase(cryptoCurrency)) {
+        if (CryptoCurrency.BTCP.getCode().equalsIgnoreCase(cryptoCurrency)) {
             return new BitcoinPrivateAddressValidator();
         }
         return null;
@@ -74,7 +93,7 @@ public class BitcoinPrivateExtension extends AbstractExtension {
             StringTokenizer st = new StringTokenizer(sourceLogin, ":");
             String exchangeType = st.nextToken();
             if ("coinmarketcap".equalsIgnoreCase(exchangeType)) {
-                String preferredFiatCurrency = Currencies.USD;
+                String preferredFiatCurrency = FiatCurrency.USD.getCode();
                 String apiKey = null;
                 if (st.hasMoreTokens()) {
                     preferredFiatCurrency = st.nextToken().toUpperCase();
@@ -91,7 +110,7 @@ public class BitcoinPrivateExtension extends AbstractExtension {
                     } catch (Throwable e) {
                     }
                 }
-                String preferedFiatCurrency = Currencies.USD;
+                String preferedFiatCurrency = FiatCurrency.USD.getCode();
                 if (st.hasMoreTokens()) {
                     preferedFiatCurrency = st.nextToken().toUpperCase();
                 }
@@ -104,7 +123,7 @@ public class BitcoinPrivateExtension extends AbstractExtension {
     @Override
     public Set<String> getSupportedCryptoCurrencies() {
         Set<String> result = new HashSet<>();
-        result.add(Currencies.BTCP);
+        result.add(CryptoCurrency.BTCP.getCode());
         return result;
     }
 

@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2016 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -21,20 +21,16 @@ package com.generalbytes.batm.server.extensions.extra.bitcoin.paymentprocessors.
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
-@Path("/api/v1")
+@Path("/api/v3")
 @Produces(MediaType.APPLICATION_JSON)
 public interface IBitcoinPay {
-
     @POST
-    @Path("/payment/btc")
+    @Path("/invoices")
     @Consumes(MediaType.APPLICATION_JSON)
     BitcoinPayPaymentResponseDTO createNewPaymentRequest(@HeaderParam("Authorization") String token, BitcoinPayPaymentRequestRequestDTO request);
 
 
     @GET
-    @Path("/payment/btc/{payment_id}")
+    @Path("/invoices/{payment_id}")
     BitcoinPayPaymentResponseDTO getPaymentStatus(@HeaderParam("Authorization") String token, @PathParam("payment_id") String paymentId);
-
-
-
 }

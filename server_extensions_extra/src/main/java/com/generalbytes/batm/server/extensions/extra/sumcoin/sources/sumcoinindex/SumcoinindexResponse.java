@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2016 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -17,7 +17,6 @@
  ************************************************************************************/
 package com.generalbytes.batm.server.extensions.extra.sumcoin.sources.sumcoinindex;
 
-import com.generalbytes.batm.server.extensions.extra.sumcoin.sources.sumcoinindex.*;
 import java.math.BigDecimal;
 import com.fasterxml.jackson.annotation.JsonProperty;
 

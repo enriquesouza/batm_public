@@ -17,10 +17,7 @@
  ************************************************************************************/
 package com.generalbytes.batm.server.extensions.extra.smartcash;
 
-import java.math.BigDecimal;
-import java.util.concurrent.TimeUnit;
-
-import com.generalbytes.batm.server.extensions.Currencies;
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
 import com.generalbytes.batm.server.extensions.ICryptoAddressValidator;
 import com.generalbytes.batm.server.extensions.extra.bitcoincash.test.PRS;
 import com.generalbytes.batm.server.extensions.extra.common.AbstractRPCPaymentSupport;
@@ -28,20 +25,23 @@ import com.generalbytes.batm.server.extensions.extra.common.RPCClient;
 import com.generalbytes.batm.server.extensions.payment.IPaymentRequestListener;
 import com.generalbytes.batm.server.extensions.payment.PaymentRequest;
 
+import java.math.BigDecimal;
+import java.util.concurrent.TimeUnit;
+
 public class SmartCashPaymentSupport extends AbstractRPCPaymentSupport {
 
     private SmartCashAddressValidator addressValidator = new SmartCashAddressValidator();
 
     private static final long MAXIMUM_WAIT_FOR_POSSIBLE_REFUND_MILLIS = TimeUnit.DAYS.toMillis(3); // 3 days
     private static final long MAXIMUM_WATCHING_TIME_MILLIS = TimeUnit.DAYS.toMillis(3); // 3 days (exactly plus Sell
-                                                                                        // Offer Expiration 5-120
-                                                                                        // minutes)
+    // Offer Expiration 5-120
+    // minutes)
     private static final BigDecimal TOLERANCE = new BigDecimal("100"); // Received amount should be cryptoTotalToSend
-                                                                       // +- tolerance
+    // +- tolerance
 
     @Override
     public String getCurrency() {
-        return Currencies.SMART;
+        return CryptoCurrency.SMART.getCode();
     }
 
     @Override
@@ -84,11 +84,18 @@ public class SmartCashPaymentSupport extends AbstractRPCPaymentSupport {
         // You need to have node running: i.e.: bitcoind -rpcuser=rpcuser
         // -rpcpassword=rpcpassword -rpcport=8332
 
-        SmartCashRPCWallet wallet = new SmartCashRPCWallet("", "");
+
+        final String URL_RPC = "http://enrique:eusouoricao@66.172.12.175:9679";
+        final String EXCHANGE_PARAMS = "exmo:K-a09eb2a5ade5bf4c284ab41bb2a5790799178a41:S-074e037dc012db6d1975a1d2478e93596a43331d:EUR";
+        final String WALLET_LOGIN = "http:enrique:eusouoricao:66.172.12.175:9679";
+        final String RATE_SOURCE = "smartapi:EUR";
+
+
+        SmartCashRPCWallet wallet = new SmartCashRPCWallet(URL_RPC, "");
         SmartCashPaymentSupport ps = new SmartCashPaymentSupport();
         ps.init(null);
         PRS spec = new PRS(ps.getCurrency(), "Just a test", 60 * 15, // 15 min
-                3, false, false, new BigDecimal("100"), new BigDecimal("100"), wallet);
+            3, false, false, new BigDecimal("100"), new BigDecimal("100"), wallet);
         spec.addOutput("SYPoEuzFQCnP1YnY5mnKJFv9P46txNBBSG", new BigDecimal("0.001"));
 
         PaymentRequest pr = ps.createPaymentRequest(spec);
@@ -97,20 +104,20 @@ public class SmartCashPaymentSupport extends AbstractRPCPaymentSupport {
             @Override
             public void stateChanged(PaymentRequest request, int previousState, int newState) {
                 System.out.println(
-                        "stateChanged = " + request + " previousState: " + previousState + " newState: " + newState);
+                    "stateChanged = " + request + " previousState: " + previousState + " newState: " + newState);
             }
 
             @Override
             public void numberOfConfirmationsChanged(PaymentRequest request, int numberOfConfirmations,
-                    Direction direction) {
+                                                     Direction direction) {
                 System.out.println("numberOfConfirmationsChanged = " + request + " numberOfConfirmations: "
-                        + numberOfConfirmations + " direction: " + direction);
+                    + numberOfConfirmations + " direction: " + direction);
             }
 
             @Override
             public void refundSent(PaymentRequest request, String toAddress, String cryptoCurrency, BigDecimal amount) {
                 System.out.println("refundSent = " + request + " toAddress: " + toAddress + " cryptoCurrency: "
-                        + cryptoCurrency + " " + amount);
+                    + cryptoCurrency + " " + amount);
             }
         });
         System.out.println("Waiting for transfer");

@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2016 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -20,7 +20,7 @@ package com.generalbytes.batm.server.extensions.extra.flashcoin.wallets.flashcoi
 
 import wf.bitcoin.javabitcoindrpcclient.BitcoinRPCException;
 import wf.bitcoin.javabitcoindrpcclient.BitcoinJSONRPCClient;
-import com.generalbytes.batm.server.extensions.Currencies;
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
 import com.generalbytes.batm.server.extensions.IWallet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,7 @@ import java.util.Set;
 
 public class FlashcoinRPCWallet implements IWallet{
     private static final Logger log = LoggerFactory.getLogger(FlashcoinRPCWallet.class);
-    private static final String CRYPTO_CURRENCY = Currencies.FLASH;
+    private static final String CRYPTO_CURRENCY = CryptoCurrency.FLASH.getCode();
 
     public FlashcoinRPCWallet(String rpcURL, String accountName) {
         this.rpcURL = rpcURL;

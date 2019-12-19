@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id=":server_extensions_api:test" external.linked.project.path="$MODULE_DIR$/../../../server_extensions_api" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="com.generalbytes.batm.public" external.system.module.type="sourceSet" external.system.module.version="1.0.7-SNAPSHOT" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
+    <output-test url="file://$MODULE_DIR$/../../../server_extensions_api/out/test/classes" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../server_extensions_api/src/test" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="batm_public_enrique.server_extensions_api.main" />
+    <orderEntry type="module" module-name="batm_public_enrique.currencies.main" />
+    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.28" level="project" />
+    <orderEntry type="library" name="Gradle: com.sun.mail:javax.mail:1.6.2" level="project" />
+    <orderEntry type="library" name="Gradle: com.vdurmont:emoji-java:3.1.3" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: javax.activation:activation:1.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.json:json:20180130" level="project" />
+  </component>
+  <component name="TestModuleProperties" production-module="batm_public_enrique.server_extensions_api.main" />
+</module>

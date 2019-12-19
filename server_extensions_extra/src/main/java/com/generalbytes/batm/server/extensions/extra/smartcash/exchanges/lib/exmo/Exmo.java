@@ -1,5 +1,11 @@
 package com.generalbytes.batm.server.extensions.extra.smartcash.exchanges.lib.exmo;
 
+import okhttp3.*;
+import org.apache.commons.codec.binary.Hex;
+
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -7,17 +13,6 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
-import org.apache.commons.codec.binary.Hex;
-
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class Exmo {
     private static long _nonce;

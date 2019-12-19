@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2018 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -17,17 +17,21 @@
  ************************************************************************************/
 package com.generalbytes.batm.server.extensions;
 
+import com.generalbytes.batm.server.extensions.exceptions.CashbackException;
 import com.generalbytes.batm.server.extensions.exceptions.SellException;
 import com.generalbytes.batm.server.extensions.watchlist.WatchListQuery;
 import com.generalbytes.batm.server.extensions.watchlist.WatchListResult;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.net.InetSocketAddress;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 public interface IExtensionContext {
+
     int DIRECTION_NONE          = 1;
     int DIRECTION_BUY_CRYPTO    = 2; //from customer view
     int DIRECTION_SELL_CRYPTO   = 4; //from customer view
@@ -101,7 +105,7 @@ public interface IExtensionContext {
      * @param phoneNumber
      * @return
      */
-    IIdentity findIdentityByPhoneNumber(String phoneNumber);
+    List<IIdentity> findIdentitiesByPhoneNumber(String phoneNumber);
 
 
     /**
@@ -117,7 +121,43 @@ public interface IExtensionContext {
      * @param phoneNumber
      * @return
      */
-    IIdentity findIdentityByPhoneNumber(String phoneNumber, String countryName);
+    List<IIdentity> findIdentityByPhoneNumber(String phoneNumber, String countryName);
+
+    /**
+     *
+     * @param configurationCashCurrency
+     * @param terminalSerialNumber
+     * @param externalId
+     * @param limitCashPerTransaction
+     * @param limitCashPerHour
+     * @param limitCashPerDay
+     * @param limitCashPerWeek
+     * @param limitCashPerMonth
+     * @param note
+     * @param state see {@link IIdentity#STATE_REGISTERED} etc.
+     * @param vipBuyDiscount buy fee discount in percent
+     * @param vipSellDiscount sell fee discount in percent
+     * @param created
+     * @param registered
+     * @return Identity with generated ID (identityPublicId)
+     */
+    IIdentity addIdentity(String configurationCashCurrency, String terminalSerialNumber, String externalId, List<ILimit> limitCashPerTransaction, List<ILimit> limitCashPerHour, List<ILimit> limitCashPerDay, List<ILimit> limitCashPerWeek, List<ILimit> limitCashPerMonth, String note, int state, BigDecimal vipBuyDiscount, BigDecimal vipSellDiscount, Date created, Date registered);
+
+    /**
+     * adds Identity Piece to an identity specified by identityPublicId
+     * @param identityPublicId
+     * @param iidentityPiece
+     * @return true in case of success
+     */
+    boolean addIdentityPiece(String identityPublicId, IIdentityPiece iidentityPiece);
+
+    /**
+     *
+     * @return a tunnel manager that allows creating ssh tunnels on a remote ssh server.
+     * Used for creating encrypted tunnels for wallets on remote hosts.
+     * See {@link ITunnelManager#connectIfNeeded(String, InetSocketAddress)}
+     */
+    ITunnelManager getTunnelManager();
 
     //Email related stuff
     public static class EmbeddedEmailImage {
@@ -226,6 +266,15 @@ public interface IExtensionContext {
      */
     ITransactionSellInfo sellCrypto(String terminalSerialNumber, BigDecimal fiatAmount, String fiatCurrency, BigDecimal cryptoAmount, String cryptoCurrency, String identityPublicId, String discountCode) throws SellException;
 
+    /**
+     * Call this transaction to create a cash back transaction. After this call server will allocate cash for the customer that can visit machine and withdraw cash.
+     * @param fiatAmount
+     * @param fiatCurrency
+     * @param identityPublicId
+     * @return - read ITransactionSellInfo.getTransactionUUID() to find out what should be filled in sell QR code.
+     */
+    ITransactionCashbackInfo cashback(String terminalSerialNumber, BigDecimal fiatAmount, String fiatCurrency, String identityPublicId) throws CashbackException;
+
 
     /**
      * This method is used to get exchange rates of specific terminal and specified directions (@see DIRECTION_BUY_CRYPTO|DIRECTION_SELL_CRYPTO  etc)
@@ -313,4 +362,22 @@ public interface IExtensionContext {
      * @return
      */
     WatchListResult searchWatchList(WatchListQuery query);
+
+    /**
+     * Returns Cash Collections ordered by sequence ID (primary key).
+     * @param terminalSerialNumber
+     * @param dateFrom
+     * @param dateTo
+     * @return
+     */
+    List<ITerminalCashCollectionRecord> getCashCollections(String terminalSerialNumber, Date dateFrom, Date dateTo);
+
+    /**
+     * Returns Event Logs ordered by ordered by sequence ID (primary key).
+     * @param terminalSerialNumber
+     * @param dateFrom
+     * @param dateTo
+     * @return
+     */
+    List<IEventRecord> getEvents(String terminalSerialNumber, Date dateFrom, Date dateTo);
 }

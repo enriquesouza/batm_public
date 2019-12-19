@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2018 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -87,6 +87,20 @@ public class RPCWallet implements IWallet, IRPCWallet{
             }else{
                 return addressesByAccount.get(0);
             }
+        } catch (BitcoinRPCException e) {
+            log.error("Error", e);
+            return null;
+        }
+    }
+
+    public String generateNewDepositCryptoAddress(String cryptoCurrency, String label) {
+        if (!this.cryptoCurrency.equalsIgnoreCase(cryptoCurrency)) {
+            log.error("RPCWallet wallet error: unknown cryptocurrency.");
+            return null;
+        }
+
+        try {
+            return client.getNewAddress(accountName);
         } catch (BitcoinRPCException e) {
             log.error("Error", e);
             return null;

@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2016 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -18,7 +18,7 @@
 
 package com.generalbytes.batm.server.extensions;
 
-import com.generalbytes.batm.server.extensions.chat.IChatCommand;
+import com.generalbytes.batm.server.extensions.aml.IExternalIdentityProvider;
 import com.generalbytes.batm.server.extensions.watchlist.IWatchList;
 
 import java.util.Set;
@@ -82,12 +82,17 @@ public interface IExtension {
 
     /**
      * This method is used for creating implementation of cryptocurrency hot wallet used by the server
-     * @param walletLogin
-     * @return
      *
+     * @param walletLogin colon-separated list of parameters for the wallet connection.
+     *                    The first parameter ("prefix") defines which wallet to use.
+     * @param tunnelPassword ssh password to establish an encrypted tunnel to the wallet host.
+     *                    It can be {@null null} or an empty string when no tunnel is required.
+     *                    If the wallet defined by the prefix in {@code walletLogin} is not supporting tunnels
+     *                    {@code tunnelPassword} parameter is ignored.
+     * @return
      * @see com.generalbytes.batm.server.extensions.IWallet
      */
-    IWallet createWallet(String walletLogin);
+    IWallet createWallet(String walletLogin, String tunnelPassword);
 
     /**
      * This method is used for creating implementation cryptocurrency address validator used by the server
@@ -133,4 +138,10 @@ public interface IExtension {
      * @return
      */
     Set<Class> getChatCommands();
+
+    /**
+     * Optionally returns external identity providers that can be used by server to look up identities.
+     * @return
+     */
+    Set<IExternalIdentityProvider> getIdentityProviders();
 }

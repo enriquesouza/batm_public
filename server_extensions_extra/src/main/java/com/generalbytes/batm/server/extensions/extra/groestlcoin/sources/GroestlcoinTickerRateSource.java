@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2016 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -17,8 +17,8 @@
  ************************************************************************************/
 package com.generalbytes.batm.server.extensions.extra.groestlcoin.sources;
 
-import com.generalbytes.batm.server.extensions.Currencies;
-import com.generalbytes.batm.server.extensions.Currencies;
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
+import com.generalbytes.batm.common.currencies.FiatCurrency;
 import com.generalbytes.batm.server.extensions.IRateSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,10 +44,10 @@ public class GroestlcoinTickerRateSource implements IRateSource{
 
     @Override
     public BigDecimal getExchangeRateLast(String cryptoCurrency, String fiatCurrency) {
-        if (!(Currencies.GRS.equalsIgnoreCase(cryptoCurrency))) {
+        if (!(CryptoCurrency.GRS.getCode().equalsIgnoreCase(cryptoCurrency))) {
             return null;
         }
-        if (!(Currencies.EUR.equalsIgnoreCase(fiatCurrency))) {
+        if (!(FiatCurrency.EUR.getCode().equalsIgnoreCase(fiatCurrency))) {
             return null;
         }
 
@@ -79,15 +79,15 @@ public class GroestlcoinTickerRateSource implements IRateSource{
     }
 
     private BigDecimal getExchangeRateLastSync(String cryptoCurrency, String fiatCurrency) {
-        if (!(Currencies.GRS.equalsIgnoreCase(cryptoCurrency))) {
+        if (!(CryptoCurrency.GRS.getCode().equalsIgnoreCase(cryptoCurrency))) {
             return null;
         }
-        if (!(Currencies.EUR.equalsIgnoreCase(fiatCurrency))) {
+        if (!(FiatCurrency.EUR.getCode().equalsIgnoreCase(fiatCurrency))) {
             return null;
         }
         GroestlcoinTickerResponse ticker = api.getTicker();
         if (ticker != null && ticker.getEUR() != null) {
-			if (Currencies.EUR.equalsIgnoreCase(fiatCurrency)){
+			if (FiatCurrency.EUR.getCode().equalsIgnoreCase(fiatCurrency)){
                 return ticker.getEUR().getSell15m();
             }
             return null;
@@ -98,20 +98,20 @@ public class GroestlcoinTickerRateSource implements IRateSource{
     @Override
     public Set<String> getCryptoCurrencies() {
         Set<String> result = new HashSet<String>();
-        result.add(Currencies.GRS);
+        result.add(CryptoCurrency.GRS.getCode());
         return result;
     }
 
     @Override
     public Set<String> getFiatCurrencies() {
         Set<String> result = new HashSet<String>();
-        result.add(Currencies.EUR);
+        result.add(FiatCurrency.EUR.getCode());
         return result;
     }
 
     @Override
     public String getPreferredFiatCurrency() {
-        return Currencies.EUR;
+        return FiatCurrency.EUR.getCode();
     }
 
     public static void main(String[] args) {

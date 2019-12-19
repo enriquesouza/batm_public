@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2016 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -17,19 +17,18 @@
  ************************************************************************************/
 package com.generalbytes.batm.server.extensions.extra.dash;
 
-import com.generalbytes.batm.server.coinutil.AddressFormatException;
-import com.generalbytes.batm.server.coinutil.Base58;
-import com.generalbytes.batm.server.extensions.ExtensionsUtil;
 import com.generalbytes.batm.server.extensions.ICryptoAddressValidator;
-
+import com.generalbytes.batm.server.coinutil.Base58;
+import com.generalbytes.batm.server.coinutil.AddressFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DashAddressValidator implements ICryptoAddressValidator {
     private static final Logger log = LoggerFactory.getLogger("batm.master.extensions.DashAddressValidator");
+
     @Override
     public boolean isAddressValid(String address) {
-        if (address.startsWith("X")) {
+        if (address.startsWith("X") || address.startsWith("7")) {
             try {
                 Base58.decodeToBigInteger(address);
                 Base58.decodeChecked(address);
@@ -38,9 +37,8 @@ public class DashAddressValidator implements ICryptoAddressValidator {
                 return false;
             }
             return true;
-        }else{
-            return false;
         }
+        return false;
     }
 
     @Override

@@ -3,7 +3,8 @@ package com.generalbytes.batm.server.extensions.extra.smartcash.exchanges.hitbtc
 import java.util.HashSet;
 import java.util.Set;
 
-import com.generalbytes.batm.server.extensions.Currencies;
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
+import com.generalbytes.batm.common.currencies.FiatCurrency;
 import com.generalbytes.batm.server.extensions.extra.bitcoin.exchanges.XChangeExchange;
 
 import org.knowm.xchange.ExchangeSpecification;
@@ -32,9 +33,9 @@ public class HitbtcExchange extends XChangeExchange {
     @Override
     public Set<String> getCryptoCurrencies() {
         Set<String> cryptoCurrencies = new HashSet<>();
-        cryptoCurrencies.add(Currencies.BTC);
+        cryptoCurrencies.add(CryptoCurrency.BTC.getCode());
 
-        cryptoCurrencies.add(Currencies.SMART);
+        cryptoCurrencies.add(CryptoCurrency.SMART.getCode());
 
         return cryptoCurrencies;
     }
@@ -42,7 +43,7 @@ public class HitbtcExchange extends XChangeExchange {
     @Override
     public Set<String> getFiatCurrencies() {
         Set<String> fiatCurrencies = new HashSet<>();
-        fiatCurrencies.add(Currencies.USD);
+        fiatCurrencies.add(FiatCurrency.USD.getCode());
         return fiatCurrencies;
     }
 

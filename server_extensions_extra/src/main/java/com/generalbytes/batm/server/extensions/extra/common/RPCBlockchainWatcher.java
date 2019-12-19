@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2016 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -132,7 +132,7 @@ public class RPCBlockchainWatcher implements IBlockchainWatcher{
                     try {
                         Thread.sleep(1000); //wait one second - sometimes it takes few seconds for wallet to find its transaction
                     } catch (InterruptedException e1) {
-                        e1.printStackTrace();
+                        log.error("", e1);
                     }
                 }
                 if (transaction != null) {
@@ -343,7 +343,7 @@ public class RPCBlockchainWatcher implements IBlockchainWatcher{
 //
 //                }
 //            };
-//            w.addAddress(Currencies.BCH, "qzezfqhxej3nyz3t5pq3vzmhazgkgns5qcvyul5cqj", new IBlockchainWatcherAddressListener() {
+//            w.addAddress(CryptoCurrency.BCH.getCode(), "qzezfqhxej3nyz3t5pq3vzmhazgkgns5qcvyul5cqj", new IBlockchainWatcherAddressListener() {
 //                @Override
 //                public void newTransactionSeen(String cryptoCurrency, String address, String transactionId, int confirmations, Object tag) {
 //                    log.info("New transaction " + transactionId + " seen on address " + address + " confirmations: " + confirmations + " tag:" + tag);

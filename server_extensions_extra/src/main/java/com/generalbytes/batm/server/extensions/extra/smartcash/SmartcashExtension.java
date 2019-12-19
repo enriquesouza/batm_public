@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2016 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -17,30 +17,24 @@
  ************************************************************************************/
 package com.generalbytes.batm.server.extensions.extra.smartcash;
 
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
+import com.generalbytes.batm.common.currencies.FiatCurrency;
+import com.generalbytes.batm.server.extensions.*;
+import com.generalbytes.batm.server.extensions.FixPriceRateSource;
+import com.generalbytes.batm.server.extensions.extra.smartcash.exchanges.exmo.ExmoExchange;
+import com.generalbytes.batm.server.extensions.extra.smartcash.exchanges.hitbtc.HitbtcExchange;
+import com.generalbytes.batm.server.extensions.extra.smartcash.sources.smartcash.SmartCashRateSource;
+import com.generalbytes.batm.server.extensions.extra.smartcash.wallets.smartcashd.SmartcashRPCWallet;
+import org.knowm.xchange.exceptions.ExchangeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import com.generalbytes.batm.server.extensions.AbstractExtension;
-import com.generalbytes.batm.server.extensions.CryptoCurrencyDefinition;
-import com.generalbytes.batm.server.extensions.Currencies;
-import com.generalbytes.batm.server.extensions.FixPriceRateSource;
-import com.generalbytes.batm.server.extensions.ICryptoAddressValidator;
-import com.generalbytes.batm.server.extensions.ICryptoCurrencyDefinition;
-import com.generalbytes.batm.server.extensions.IExchange;
-import com.generalbytes.batm.server.extensions.IPaperWalletGenerator;
-import com.generalbytes.batm.server.extensions.IRateSource;
-import com.generalbytes.batm.server.extensions.IWallet;
-import com.generalbytes.batm.server.extensions.extra.smartcash.exchanges.exmo.ExmoExchange;
-import com.generalbytes.batm.server.extensions.extra.smartcash.exchanges.hitbtc.HitbtcExchange;
-import com.generalbytes.batm.server.extensions.extra.smartcash.sources.smartcash.SmartCashRateSource;
-
-import org.knowm.xchange.exceptions.ExchangeException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-public class SmartcashExtension extends AbstractExtension {
+public class SmartcashExtension extends AbstractExtension{
 
     private static final String SMARTAPI = "smartapi";
     private static final String SMARTFIX = "smartfix";
@@ -51,7 +45,7 @@ public class SmartcashExtension extends AbstractExtension {
     private static final String SMARTCASHD = "smartcashd";
     private static final Logger log = LoggerFactory.getLogger("batm.master.ExmoExchange");
     private static final CryptoCurrencyDefinition DEFINITION = new SmartCashDefinition();
-    public static final String CURRENCY = Currencies.SMART;
+    public static final String CURRENCY = CryptoCurrency.SMART.toString();
 
     @Override
     public String getName() {
@@ -59,38 +53,89 @@ public class SmartcashExtension extends AbstractExtension {
     }
 
     @Override
-    public IWallet createWallet(String walletLogin) {
-        if (walletLogin != null && !walletLogin.trim().isEmpty()) {
-            StringTokenizer st = new StringTokenizer(walletLogin, DELIM);
+    public IWallet createWallet(String walletLogin, String tunnelPassword) {
+        if (walletLogin !=null && !walletLogin.trim().isEmpty()) {
+            StringTokenizer st = new StringTokenizer(walletLogin,":");
             String walletType = st.nextToken();
-            if (SMARTCASHD.equalsIgnoreCase(walletType)) {
-                // "bitcoind:protocol:user:password:ip:port:accountname"
+
+            if ("smartcashd".equalsIgnoreCase(walletType)) {
+                //"smartcashd:protocol:user:password:ip:port:accountname"
 
                 String protocol = st.nextToken();
                 String username = st.nextToken();
                 String password = st.nextToken();
                 String hostname = st.nextToken();
                 String port = st.nextToken();
-                String accountName = STRING;
+                String accountName ="";
                 if (st.hasMoreTokens()) {
                     accountName = st.nextToken();
                 }
 
-                if (protocol != null && username != null && password != null && hostname != null && port != null
-                        && accountName != null) {
-                    String rpcURL = protocol + "://" + username + DELIM + password + "@" + hostname + DELIM + port;
-                    return new SmartCashRPCWallet(rpcURL, accountName);
+
+                if (protocol != null && username != null && password != null && hostname !=null && port != null && accountName != null) {
+                    String rpcURL = protocol +"://" + username +":" + password + "@" + hostname +":" + port;
+                    return new SmartcashRPCWallet(rpcURL,accountName);
+                }
+            }
+            if ("smartdemo".equalsIgnoreCase(walletType)) {
+
+                String fiatCurrency = st.nextToken();
+                String walletAddress = "";
+                if (st.hasMoreTokens()) {
+                    walletAddress = st.nextToken();
+                }
+
+                if (fiatCurrency != null && walletAddress != null) {
+                    return new DummyExchangeAndWalletAndSource(fiatCurrency, CryptoCurrency.SMART.getCode(), walletAddress);
                 }
             }
         }
+        return null;
+    }
 
+    @Override
+    public ICryptoAddressValidator createAddressValidator(String cryptoCurrency) {
+        if (CryptoCurrency.SMART.getCode().equalsIgnoreCase(cryptoCurrency)) {
+            return new SmartCashAddressValidator();
+        }
+        return null;
+    }
+
+    @Override
+    public IRateSource createRateSource(String sourceLogin) {
+        if (sourceLogin != null && !sourceLogin.trim().isEmpty()) {
+            StringTokenizer st = new StringTokenizer(sourceLogin,":");
+            String exchangeType = st.nextToken();
+
+            if ("smartfix".equalsIgnoreCase(exchangeType)) {
+                BigDecimal rate = BigDecimal.ZERO;
+                if (st.hasMoreTokens()) {
+                    try {
+                        rate = new BigDecimal(st.nextToken());
+                    } catch (Throwable e) {
+                    }
+                }
+                String preferedFiatCurrency = FiatCurrency.USD.getCode();
+                if (st.hasMoreTokens()) {
+                    preferedFiatCurrency = st.nextToken().toUpperCase();
+                }
+                return new FixPriceRateSource(rate,preferedFiatCurrency);
+            }else if ("smartapi".equalsIgnoreCase(exchangeType)) {
+                String preferredFiatCurrency = FiatCurrency.USD.getCode();
+                if (st.hasMoreTokens()) {
+                    preferredFiatCurrency = st.nextToken();
+                }
+                return new SmartCashRateSource(preferredFiatCurrency);
+            }
+
+        }
         return null;
     }
 
     @Override
     public Set<String> getSupportedCryptoCurrencies() {
         Set<String> result = new HashSet<String>();
-        result.add(CURRENCY);
+        result.add(CryptoCurrency.SMART.getCode());
         return result;
     }
 
@@ -99,14 +144,6 @@ public class SmartcashExtension extends AbstractExtension {
         Set<ICryptoCurrencyDefinition> result = new HashSet<>();
         result.add(DEFINITION);
         return result;
-    }
-
-    @Override
-    public ICryptoAddressValidator createAddressValidator(String cryptoCurrency) {
-        if (CURRENCY.equalsIgnoreCase(cryptoCurrency)) {
-            return new SmartCashAddressValidator();
-        }
-        return null;
     }
 
     @Override
@@ -136,7 +173,7 @@ public class SmartcashExtension extends AbstractExtension {
 
                     log.info("apiSecret CREATE EXCHANGE - " + apiSecret);
 
-                    String preferredFiatCurrency = Currencies.EUR;
+                    String preferredFiatCurrency = FiatCurrency.EUR.getCode();
 
                     log.info("preferredFiatCurrency CREATE EXCHANGE - " + preferredFiatCurrency);
 
@@ -149,7 +186,7 @@ public class SmartcashExtension extends AbstractExtension {
                     return exchange;
 
                 } else if (HITBTC.equalsIgnoreCase(prefix)) {
-                    String preferredFiatCurrency = Currencies.USD;
+                    String preferredFiatCurrency = FiatCurrency.USD.getCode();
                     String apiKey = paramTokenizer.nextToken();
                     String apiSecret = paramTokenizer.nextToken();
                     return new HitbtcExchange(apiKey, apiSecret, preferredFiatCurrency);
@@ -168,37 +205,6 @@ public class SmartcashExtension extends AbstractExtension {
         return null;
     }
 
-    @Override
-    public IRateSource createRateSource(String sourceLogin) {
-
-        if (sourceLogin != null && !sourceLogin.trim().isEmpty()) {
-            StringTokenizer st = new StringTokenizer(sourceLogin, DELIM);
-            String exchangeType = st.nextToken();
-
-            if (SMARTFIX.equalsIgnoreCase(exchangeType)) {
-                BigDecimal rate = BigDecimal.ZERO;
-                if (st.hasMoreTokens()) {
-                    try {
-                        rate = new BigDecimal(st.nextToken());
-                    } catch (Throwable e) {
-                    }
-                }
-                String preferedFiatCurrency = Currencies.USD;
-                if (st.hasMoreTokens()) {
-                    preferedFiatCurrency = st.nextToken().toUpperCase();
-                }
-                return new FixPriceRateSource(rate, preferedFiatCurrency);
-            } else if (SMARTAPI.equalsIgnoreCase(exchangeType)) {
-                String preferredFiatCurrency = Currencies.USD;
-                if (st.hasMoreTokens()) {
-                    preferredFiatCurrency = st.nextToken();
-                }
-                return new SmartCashRateSource(preferredFiatCurrency);
-            }
-
-        }
-        return null;
-    }
 
     @Override
     public IPaperWalletGenerator createPaperWalletGenerator(String cryptoCurrency) {

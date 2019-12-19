@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2018 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -20,6 +20,23 @@ package com.generalbytes.batm.server.extensions;
 import java.util.Map;
 
 public interface ITransactionListener {
+
+    /**
+     * Called before the person inserts cash, or sell or withdraw screen is entered but after the moment when identity is established and limits are calculated.
+     * @param preparation
+     * @return when returned false, error message is displayed to user or withdrawal reason
+     */
+    boolean isTransactionPreparationApproved(ITransactionPreparation preparation);
+
+    /**
+     * Callback method that is called by server before transaction is executed - however the cash is already inserted in machine in case of buy transaction.
+     * If your method returns false than transaction will not take place and will fail with error ERROR_NOT_APPROVED.
+     * Try to return from this method in less then 10 seconds.
+     * @param transactionRequest
+     * @return
+     */
+    boolean isTransactionApproved(ITransactionRequest transactionRequest);
+
     /**
      * Callback method that is called by server when transaction is created on server
      * Returned value is a map of keys and values that will be stored in the database and available for later use in ticket template

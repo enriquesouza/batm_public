@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (C) 2014-2016 GENERAL BYTES s.r.o. All rights reserved.
+ * Copyright (C) 2014-2019 GENERAL BYTES s.r.o. All rights reserved.
  *
  * This software may be distributed and modified under the terms of the GNU
  * General Public License version 2 (GPL2) as published by the Free Software
@@ -19,7 +19,8 @@
 
 package com.generalbytes.batm.server.extensions.extra.bitcoin.sources.bity;
 
-import com.generalbytes.batm.server.extensions.Currencies;
+import com.generalbytes.batm.common.currencies.CryptoCurrency;
+import com.generalbytes.batm.common.currencies.FiatCurrency;
 import com.generalbytes.batm.server.extensions.IRateSourceAdvanced;
 import com.generalbytes.batm.server.extensions.extra.bitcoin.sources.bity.dto.RateInfo;
 import si.mazi.rescu.RestProxyFactory;
@@ -40,16 +41,16 @@ public class BityRateSource implements IRateSourceAdvanced{
     @Override
     public Set<String> getCryptoCurrencies() {
         Set<String> result = new HashSet<>();
-        result.add(Currencies.BTC);
-        result.add(Currencies.ETH);
+        result.add(CryptoCurrency.BTC.getCode());
+        result.add(CryptoCurrency.ETH.getCode());
         return result;
     }
 
     @Override
     public Set<String> getFiatCurrencies() {
         Set<String> result = new HashSet<>();
-        result.add(Currencies.CHF);
-        result.add(Currencies.EUR);
+        result.add(FiatCurrency.CHF.getCode());
+        result.add(FiatCurrency.EUR.getCode());
         return result;
     }
 
