@@ -96,7 +96,7 @@ public class SmartCashPaymentSupport extends AbstractRPCPaymentSupport {
         ps.init(null);
         PRS spec = new PRS(ps.getCurrency(), "Just a test", 60 * 15, // 15 min
             3, false, false, new BigDecimal("100"), new BigDecimal("100"), wallet);
-        spec.addOutput("SYPoEuzFQCnP1YnY5mnKJFv9P46txNBBSG", new BigDecimal("0.001"));
+        spec.addOutput("SgPMhNeG16Ty6VaPSnAtxNJAQ2JRnhTGaQ", new BigDecimal("0.001"));
 
         PaymentRequest pr = ps.createPaymentRequest(spec);
         System.out.println(pr);

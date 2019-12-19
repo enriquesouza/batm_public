@@ -24,7 +24,7 @@ import com.generalbytes.batm.server.extensions.FixPriceRateSource;
 import com.generalbytes.batm.server.extensions.extra.smartcash.exchanges.exmo.ExmoExchange;
 import com.generalbytes.batm.server.extensions.extra.smartcash.exchanges.hitbtc.HitbtcExchange;
 import com.generalbytes.batm.server.extensions.extra.smartcash.sources.smartcash.SmartCashRateSource;
-import com.generalbytes.batm.server.extensions.extra.smartcash.wallets.smartcashd.SmartcashRPCWallet;
+//import com.generalbytes.batm.server.extensions.extra.smartcash.wallets.smartcashd.SmartcashRPCWallet;
 import org.knowm.xchange.exceptions.ExchangeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +74,7 @@ public class SmartcashExtension extends AbstractExtension{
 
                 if (protocol != null && username != null && password != null && hostname !=null && port != null && accountName != null) {
                     String rpcURL = protocol +"://" + username +":" + password + "@" + hostname +":" + port;
-                    return new SmartcashRPCWallet(rpcURL,accountName);
+                    return new SmartCashRPCWallet(rpcURL,accountName);
                 }
             }
             if ("smartdemo".equalsIgnoreCase(walletType)) {
